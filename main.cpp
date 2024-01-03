@@ -1,21 +1,32 @@
 #include <iostream>
 #include "./src/Tokenizer.h"
+#include "./src/Parser.h"
 
-int main(){
-    std::string input = "CREATE DATABASE {test, test2}";
-    Tokenizer tokenizer(input);
-    std::vector<Token> tokens = tokenizer.tokenize();
+int main() {
+    std::string input;
 
-    for (const Token& token : tokens) {
-        std::cout << "Token: " << (int)token.type;
-        if (token.value.has_value()) {
-            std::cout << token.value.value();
+
+    while (true) {
+        std::cout << "mlinql > ";
+        if (!std::getline(std::cin, input)) {
+            break;
         }
-        std::cout << std::endl;
+        try {
+            Tokenizer tokenizer(input);
+            std::vector<Token> tokens = tokenizer.tokenize();
+            Parser parser(tokens);
+            std::unique_ptr<NodeProgram> program = parser.parseProgram();
+            std::cout << "Parsed program" << std::endl;
+            for (auto& stmt : program->statements){
+                stmt->print();
+            }
+
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
     }
-
-
 
 
     return 0;
 }
+

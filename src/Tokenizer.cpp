@@ -56,7 +56,6 @@ std::vector<Token> Tokenizer::tokenize(){
 
     }catch (const std::runtime_error& e){
         std::cout << "Error: " << e.what() << std::endl;
-        exit(1);
     }
     
     

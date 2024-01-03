@@ -36,11 +36,11 @@ private:
         if (m_index + ahead >= m_string.length()){
             return {};
         }else{
-            return m_string[m_index + ahead];   
+            return m_string.at(m_index + ahead);   
         }
     }
 
     char consume(){
-        return m_string[m_index++];
+        return m_string.at(m_index++);
     }
 };
