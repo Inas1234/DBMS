@@ -22,21 +22,9 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 consume();
                 std::unique_ptr<NodeStmtCreateDatabase> stmt = std::make_unique<NodeStmtCreateDatabase>();
                 stmt->database_name = parseExpression();
-                if (peak().value().type == TokenType::LBRACE){
-                    consume();
-                    while (peak().value().type != TokenType::RBRACE){
-                        stmt->columns.push_back(parseExpression());
-                        if (peak().value().type == TokenType::COMMA){
-                            consume();
-                        }
-                    }
-                    consume();
-                    return stmt;
-                }
-                else{
-                    throw std::runtime_error("Expected LBRACE");
-                }
+                return stmt;
             }
+          
             else{
                 throw std::runtime_error("Expected DATABASE");
             }
