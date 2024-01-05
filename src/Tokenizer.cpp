@@ -9,7 +9,7 @@ std::vector<Token> Tokenizer::tokenize(){
         {
             if (isalpha(peak().value())){
                 buffer.push_back(consume());
-                while (peak().has_value() && (peak().value()))
+                while (peak().has_value() && isalnum(peak().value()))
                 {
                     buffer.push_back(consume());
                 }

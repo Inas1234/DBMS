@@ -24,7 +24,6 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->database_name = parseExpression();
                 return stmt;
             }
-          
             else{
                 throw std::runtime_error("Expected DATABASE");
             }

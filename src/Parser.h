@@ -10,7 +10,6 @@
 class NodeExpr {
 public:
     virtual ~NodeExpr() {}
-    // Additional virtual functions can be added here if needed
 };
 
 class NodeExprIdentifier : public NodeExpr {
@@ -33,7 +32,7 @@ public:
 class NodeStmtCreateDatabase : public NodeStmt {
 public:
     std::unique_ptr<NodeExpr> database_name;
-    // Use the print function to print the contents of the class
+    
     void print() override{
         std::cout << "NodeStmtCreateDatabase" << std::endl;
         std::cout << "Database name: " << static_cast<NodeExprIdentifier*>(database_name.get())->name << std::endl;
