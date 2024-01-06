@@ -23,6 +23,11 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::DATABASE});
                     buffer.clear();
                 }
+                else if (buffer == "DELETE"){
+                    std::cout << "DELETE" << std::endl;
+                    tokens.push_back({TokenType::DELETE});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

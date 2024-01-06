@@ -1,4 +1,4 @@
-FILES = main.cpp ./src/Tokenizer.cpp ./src/Parser.cpp 
+FILES = main.cpp ./src/Tokenizer.cpp ./src/Parser.cpp  ./src/Generator.cpp -I ./lib/include
 
 all:
-	g++ $(FILES) -o main
+	g++ -std=c++17 $(FILES) -o main

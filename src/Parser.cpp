@@ -28,6 +28,18 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE");
             }
             break;
+        case TokenType::DELETE:
+            consume();
+            if (peak().value().type == TokenType::DATABASE){
+                consume();
+                std::unique_ptr<NodeStmtDeleteDatabase> stmt = std::make_unique<NodeStmtDeleteDatabase>();
+                stmt->database_name = parseExpression();
+                return stmt;
+            }
+            else{
+                throw std::runtime_error("Expected DATABASE");
+            }
+            break;
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

@@ -11,7 +11,8 @@ enum class TokenType{
     IDENTIFIER,
     LBRACE,
     RBRACE,
-    COMMA
+    COMMA,
+    DELETE,
 };
 
 struct Token {

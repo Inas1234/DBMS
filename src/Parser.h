@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <memory>
 #include <string>
@@ -39,6 +40,13 @@ public:
         
     } 
 };
+
+class NodeStmtDeleteDatabase : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> database_name;
+
+};
+
 
 struct NodeProgram {
     std::vector<std::unique_ptr<NodeStmt>> statements;
