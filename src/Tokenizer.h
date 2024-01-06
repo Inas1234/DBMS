@@ -13,6 +13,8 @@ enum class TokenType{
     RBRACE,
     COMMA,
     DELETE,
+    TABLE,
+    USE,
 };
 
 struct Token {

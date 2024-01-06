@@ -2,7 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <string>
 #include "Parser.h"
+#include <nlohmann/json.hpp>
 
 class Generator{
 public:
@@ -12,5 +14,4 @@ public:
     void Generate();
 private:
     std::unique_ptr<NodeProgram> m_prog;
-
 };

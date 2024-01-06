@@ -47,6 +47,16 @@ public:
 
 };
 
+class NodeStmtCreateTable : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+    std::vector<std::unique_ptr<NodeExpr>> columns;
+};
+
+class NodeStmtUseDatabase : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> database_name;
+};
 
 struct NodeProgram {
     std::vector<std::unique_ptr<NodeStmt>> statements;

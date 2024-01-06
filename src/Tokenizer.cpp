@@ -28,6 +28,16 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::DELETE});
                     buffer.clear();
                 }
+                else if (buffer == "TABLE"){
+                    std::cout << "TABLE" << std::endl;
+                    tokens.push_back({TokenType::TABLE});
+                    buffer.clear();
+                }
+                else if (buffer == "USE"){
+                    std::cout << "USE" << std::endl;
+                    tokens.push_back({TokenType::USE});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

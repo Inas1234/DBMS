@@ -24,6 +24,25 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->database_name = parseExpression();
                 return stmt;
             }
+            else if (peak().value().type == TokenType::TABLE){
+                consume();
+                std::unique_ptr<NodeStmtCreateTable> stmt = std::make_unique<NodeStmtCreateTable>();
+                stmt->table_name = parseExpression();
+                if (peak().value().type == TokenType::LBRACE){
+                    consume();
+                    while (peak().value().type != TokenType::RBRACE){
+                        stmt->columns.push_back(parseExpression());
+                        if (peak().value().type == TokenType::COMMA){
+                            consume();
+                        }
+                    }
+                    consume();
+                    return stmt;
+                }
+                else{
+                    throw std::runtime_error("Expected LBRACE");
+                }
+            }
             else{
                 throw std::runtime_error("Expected DATABASE");
             }
@@ -33,6 +52,18 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             if (peak().value().type == TokenType::DATABASE){
                 consume();
                 std::unique_ptr<NodeStmtDeleteDatabase> stmt = std::make_unique<NodeStmtDeleteDatabase>();
+                stmt->database_name = parseExpression();
+                return stmt;
+            }
+            else{
+                throw std::runtime_error("Expected DATABASE");
+            }
+            break;
+        case TokenType::USE:
+            consume();
+            if (peak().value().type == TokenType::DATABASE){
+                consume();
+                std::unique_ptr<NodeStmtUseDatabase> stmt = std::make_unique<NodeStmtUseDatabase>();
                 stmt->database_name = parseExpression();
                 return stmt;
             }
