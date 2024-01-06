@@ -20,26 +20,31 @@ void Generator::genStmt(NodeStmt& stmt){
         std::cout << "CREATE TABLE " << static_cast<NodeExprIdentifier*>(createTableStmt->table_name.get())->name << std::endl;
         std::string table_name = static_cast<NodeExprIdentifier*>(createTableStmt->table_name.get())->name;
 
-        // Read the existing JSON object from the database file
         std::ifstream db_file_in("./data/" + m_db_name + ".json");
         nlohmann::json db_json;
-        db_file_in >> db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
         db_file_in.close();
 
-        // Create a JSON object for the columns
-        nlohmann::json columns_json;
-        for (auto& col : createTableStmt->columns) {
-            std::cout << "Column: " << static_cast<NodeExprIdentifier*>(col.get())->name << std::endl;
-            std::string col_name = static_cast<NodeExprIdentifier*>(col.get())->name;
-            columns_json[col_name] = std::vector<nlohmann::json>();
+        if (db_json.find(table_name) == db_json.end()) {
+            nlohmann::json table_schema;
+            for (auto& col : createTableStmt->columns) {
+                std::string col_name = static_cast<NodeExprIdentifier*>(col.get())->name;
+                table_schema[col_name] = ""; 
+            }
+
+            db_json[table_name] = {
+                {"schema", table_schema},
+                {"data", nlohmann::json::array()}
+            };
+        }
+        else {
+            std::cout << "Table " << table_name << " already exists." << std::endl;
         }
 
-        // Add the columns JSON object to the database JSON object
-        db_json[table_name] = columns_json;
-
-        // Write the updated database JSON object back to the file
         std::ofstream db_file_out("./data/" + m_db_name + ".json");
-        db_file_out << db_json.dump(4); // dump with an indentation of 4 spaces
+        db_file_out << db_json.dump(4); 
         db_file_out.close();
     }
     else if (NodeStmtUseDatabase* useDbStmt = dynamic_cast<NodeStmtUseDatabase*>(&stmt)){
