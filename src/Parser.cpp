@@ -47,6 +47,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE");
             }
             break;
+        
         case TokenType::DELETE:
             consume();
             if (peak().value().type == TokenType::DATABASE){
@@ -55,10 +56,63 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->database_name = parseExpression();
                 return stmt;
             }
+            else if(peak().value().type == TokenType::TABLE){
+                consume();
+                std::unique_ptr<NodeStmtDeleteTable> stmt = std::make_unique<NodeStmtDeleteTable>();
+                stmt->table_name = parseExpression();
+                return stmt;
+            }
             else{
-                throw std::runtime_error("Expected DATABASE");
+                throw std::runtime_error("Expected DATABASE or TABLE"); //treba malo popravit
             }
             break;
+/*
+        case TokenType::INSERT:
+            consume();
+            if (peak().value().type == TokenType::INTO){
+                consume();
+                std::unique_ptr<NodeStmtInsertIntoTable> stmt = std::make_unique<NodeStmtInsertIntoTable>();
+                stmt->table_name = parseExpression();
+                if (peak().value().type == TokenType::LBRACE){
+                    std::cout<<"dobar if, -> consume\n";
+                    consume();
+                    while (peak().value().type != TokenType::RBRACE){
+                        std::cout<<"dobro\n";
+                        stmt->values.push_back(parseExpression());
+                        if (peak().value().type == TokenType::COMMA){
+                            consume();
+                        }
+                    }
+                    consume();
+                    return stmt;
+                }
+                else{
+                    throw std::runtime_error("Expected LBRACE");
+                }
+            }
+            else{
+                throw std::runtime_error("Expected INTO");
+            }
+            break;
+ */
+
+        case TokenType::SHOW:
+            consume();
+            if (peak().value().type == TokenType::DATABASES){
+                consume();
+                std::unique_ptr<NodeStmtShowDatabases> stmt = std::make_unique<NodeStmtShowDatabases>();
+                return stmt;
+            }
+            else if(peak().value().type == TokenType::TABLES){
+                consume();
+                std::unique_ptr<NodeStmtShowTables> stmt = std::make_unique<NodeStmtShowTables>();
+                return stmt;
+            }
+            else{
+                throw std::runtime_error("Expected DATABASES or TABLES"); //popravit, treba bit specificno
+            }
+            break;
+
         case TokenType::USE:
             consume();
             if (peak().value().type == TokenType::DATABASE){
@@ -71,6 +125,8 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE");
             }
             break;
+        //case TokenType::COMMA
+
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

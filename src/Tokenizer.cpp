@@ -38,6 +38,28 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::USE});
                     buffer.clear();
                 }
+                else if (buffer == "INSERT"){
+                    std::cout <<"INSERT" << std::endl;
+                    tokens.push_back({TokenType::INSERT});
+                    buffer.clear();
+                }
+                else if (buffer == "INTO"){
+                    std::cout << "INTO" << std::endl;
+                    tokens.push_back({TokenType::INTO});
+                    buffer.clear();
+                }
+                else if (buffer == "SHOW"){
+                    tokens.push_back({TokenType::SHOW});
+                    buffer.clear();
+                }
+                else if (buffer == "DATABASES"){
+                    tokens.push_back({TokenType::DATABASES});
+                    buffer.clear();
+                }
+                else if (buffer == "TABLES"){
+                    tokens.push_back({TokenType::TABLES});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

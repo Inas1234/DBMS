@@ -15,6 +15,11 @@ enum class TokenType{
     DELETE,
     TABLE,
     USE,
+    INSERT,
+    INTO,
+    SHOW,
+    DATABASES,
+    TABLES
 };
 
 struct Token {

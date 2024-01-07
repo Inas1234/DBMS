@@ -58,6 +58,27 @@ public:
     std::unique_ptr<NodeExpr> database_name;
 };
 
+class NodeStmtDeleteTable : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+};
+
+class NodeStmtInsertIntoTable : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+    std::vector<std::unique_ptr<NodeExpr>> values;
+    std::vector<std::unique_ptr<NodeExpr>> columns;
+};
+
+class NodeStmtShowDatabases : public NodeStmt {
+public:
+};
+
+class NodeStmtShowTables : public NodeStmt {
+public:
+};
+
+
 struct NodeProgram {
     std::vector<std::unique_ptr<NodeStmt>> statements;
 };
