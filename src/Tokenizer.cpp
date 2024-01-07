@@ -64,6 +64,22 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::VALUES});
                     buffer.clear();
                 }
+                else if (buffer == "ALTER"){
+                    tokens.push_back({TokenType::ALTER});
+                    buffer.clear();
+                }
+                else if (buffer == "ADD"){
+                    tokens.push_back({TokenType::ADD});
+                    buffer.clear();
+                }
+                else if (buffer == "DROP"){
+                    tokens.push_back({TokenType::DROP});
+                    buffer.clear();
+                }
+                else if (buffer == "COLUMN"){
+                    tokens.push_back({TokenType::COLUMN});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

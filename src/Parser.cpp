@@ -142,8 +142,39 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE");
             }
             break;
-        //case TokenType::COMMA
+        case TokenType::ALTER:
+            consume();
+            if (peak().value().type == TokenType::TABLE){
+                consume();
+                std::unique_ptr<NodeStmtAlterTable> stmt = std::make_unique<NodeStmtAlterTable>();
+                std::unique_ptr<NodeStmtAlterDropColumn> stmt2 = std::make_unique<NodeStmtAlterDropColumn>();
+                stmt->table_name = parseExpression();
+                stmt2->table_name = stmt->table_name->clone();
+                if (peak().value().type == TokenType::ADD){
+                    consume();
+                    stmt->new_column_name = parseExpression();
+                    return stmt;
+                }
+                else if (peak().value().type == TokenType::DROP){
+                    consume();
+                    if (peak().value().type == TokenType::COLUMN){
+                        consume();
+                        stmt2->column_name = parseExpression();
+                        return stmt2;
+                    }
+                    else{
+                        throw std::runtime_error("Expected COLUMN");
+                    }
+                }
+                else{
+                    throw std::runtime_error("Expected ADD or DROP");
+                }
 
+            }
+            else{
+                throw std::runtime_error("Expected TABLE");
+            }
+            break;
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

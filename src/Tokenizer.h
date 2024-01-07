@@ -20,7 +20,11 @@ enum class TokenType{
     SHOW,
     DATABASES,
     TABLES,
-    VALUES
+    VALUES,
+    ALTER,
+    ADD,
+    DROP,
+    COLUMN,
 };
 
 struct Token {

@@ -1,12 +1,8 @@
 {
-    "choad": {
-        "data": [
-            {
-                "name": "bb"
-            }
-        ],
-        "schema": {
-            "name": ""
-        }
+  "choad": {
+    "data": [],
+    "schema": {
+      "name": ""
     }
+  }
 }

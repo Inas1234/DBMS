@@ -72,8 +72,6 @@ void Generator::genStmt(NodeStmt& stmt){
         db_file_out.close();
     }
     
-    //err: INVALID TOKEN IN PARSEEXPRESSION
-    // potrebno popraviti funkciju, tako da dopisuje ispravno dopisuje u json, i da se ispravno tokenizira
     else if (NodeStmtInsertIntoTable* insertIntoTableStmt = dynamic_cast<NodeStmtInsertIntoTable*>(&stmt)){
         std::cout << "INSERT INTO TABLE " << static_cast<NodeExprIdentifier*>(insertIntoTableStmt->table_name.get())->name << std::endl;
         std::string table_name = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->table_name.get())->name;
@@ -89,7 +87,6 @@ void Generator::genStmt(NodeStmt& stmt){
             nlohmann::json table_schema = db_json[table_name]["schema"];
             nlohmann::json table_data = db_json[table_name]["data"];
             nlohmann::json row;
-        // iterate through the table structure and add the values to the row
 
             for (int i = 0; i < insertIntoTableStmt->values.size(); i++) {
                 std::string col_name = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->columns[i].get())->name;
@@ -153,8 +150,72 @@ void Generator::genStmt(NodeStmt& stmt){
         }
         std::cout << "-------------------------------------------" << std::endl;
     }
+    else if (NodeStmtAlterTable* alterTableStmt = dynamic_cast<NodeStmtAlterTable*>(&stmt)){
+        std::cout << "ALTER TABLE " << static_cast<NodeExprIdentifier*>(alterTableStmt->table_name.get())->name << std::endl;
+        std::string table_name = static_cast<NodeExprIdentifier*>(alterTableStmt->table_name.get())->name;
 
+        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        nlohmann::json db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
+        db_file_in.close();
 
+        if (db_json.find(table_name) != db_json.end()) {
+            nlohmann::json table_schema = db_json[table_name]["schema"];
+            nlohmann::json table_data = db_json[table_name]["data"];
+            nlohmann::json row;
+
+            std::string col_name = static_cast<NodeExprIdentifier*>(alterTableStmt->new_column_name.get())->name;
+            if (table_schema.find(col_name) != table_schema.end()) {
+                std::cout << "Column " << col_name << " already exists." << std::endl;
+                return;
+            }
+            table_schema[col_name] = "";
+            db_json[table_name]["schema"] = table_schema;
+
+        }
+        else {
+            std::cout << "Table " << table_name << " not found." << std::endl;
+        }
+
+        std::ofstream db_file_out("./data/" + m_db_name + ".json");
+        db_file_out << db_json.dump(4); 
+        db_file_out.close();
+    }
+    else if (NodeStmtAlterDropColumn* alterDropColumnStmt = dynamic_cast<NodeStmtAlterDropColumn*>(&stmt)){
+        std::cout << "ALTER TABLE " << static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name << std::endl;
+        std::string table_name = static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name;
+
+        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        nlohmann::json db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
+        db_file_in.close();
+
+        if (db_json.find(table_name) != db_json.end()) {
+            nlohmann::json table_schema = db_json[table_name]["schema"];
+            nlohmann::json table_data = db_json[table_name]["data"];
+            nlohmann::json row;
+
+            std::string col_name = static_cast<NodeExprIdentifier*>(alterDropColumnStmt->column_name.get())->name;
+            if (table_schema.find(col_name) == table_schema.end()) {
+                std::cout << "Column " << col_name << " not found." << std::endl;
+                return;
+            }
+            table_schema.erase(col_name);
+            db_json[table_name]["schema"] = table_schema;
+
+        }
+        else {
+            std::cout << "Table " << table_name << " not found." << std::endl;
+        }
+
+        std::ofstream db_file_out("./data/" + m_db_name + ".json");
+        db_file_out << db_json.dump(4); 
+        db_file_out.close();
+    }
     else{
         throw std::runtime_error("Invalid statement");
     }

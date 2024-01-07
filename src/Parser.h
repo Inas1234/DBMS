@@ -11,6 +11,7 @@
 class NodeExpr {
 public:
     virtual ~NodeExpr() {}
+    virtual std::unique_ptr<NodeExpr> clone() = 0;
 };
 
 class NodeExprIdentifier : public NodeExpr {
@@ -18,6 +19,10 @@ public:
     std::string name;
 
     NodeExprIdentifier(const std::string& name) : name(name) {}
+
+    std::unique_ptr<NodeExpr> clone() override{
+        return std::make_unique<NodeExprIdentifier>(name);
+    }
 };
 
 
@@ -69,6 +74,23 @@ public:
     std::vector<std::unique_ptr<NodeExpr>> values;
     std::vector<std::unique_ptr<NodeExpr>> columns;
 };
+
+
+class NodeStmtAlterTable : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+    std::unique_ptr<NodeExpr> new_column_name;
+
+
+};
+
+class NodeStmtAlterDropColumn : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+    std::unique_ptr<NodeExpr> column_name;
+};
+
+
 
 class NodeStmtShowDatabases : public NodeStmt {
 public:
