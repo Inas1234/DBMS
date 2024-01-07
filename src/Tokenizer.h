@@ -19,7 +19,8 @@ enum class TokenType{
     INTO,
     SHOW,
     DATABASES,
-    TABLES
+    TABLES,
+    VALUES
 };
 
 struct Token {

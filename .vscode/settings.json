@@ -1,7 +1,7 @@
 {
   "files.associations": {
-    "*.embeddedhtml": "html",
     "*.ejs": "html",
+    "*.embeddedhtml": "html",
     "cctype": "cpp",
     "clocale": "cpp",
     "cmath": "cpp",
@@ -88,6 +88,9 @@
     "__tuple": "cpp",
     "ios": "cpp",
     "locale": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "any": "cpp",
+    "codecvt": "cpp",
+    "forward_list": "cpp"
   }
 }

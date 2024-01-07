@@ -74,7 +74,6 @@ void Generator::genStmt(NodeStmt& stmt){
     
     //err: INVALID TOKEN IN PARSEEXPRESSION
     // potrebno popraviti funkciju, tako da dopisuje ispravno dopisuje u json, i da se ispravno tokenizira
-    /*
     else if (NodeStmtInsertIntoTable* insertIntoTableStmt = dynamic_cast<NodeStmtInsertIntoTable*>(&stmt)){
         std::cout << "INSERT INTO TABLE " << static_cast<NodeExprIdentifier*>(insertIntoTableStmt->table_name.get())->name << std::endl;
         std::string table_name = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->table_name.get())->name;
@@ -93,10 +92,15 @@ void Generator::genStmt(NodeStmt& stmt){
         // iterate through the table structure and add the values to the row
 
             for (int i = 0; i < insertIntoTableStmt->values.size(); i++) {
-                std::string col_name = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->values[i].get())->name;
-                row[col_name] = "";
+                std::string col_name = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->columns[i].get())->name;
+                if (table_schema.find(col_name) == table_schema.end()) {
+                    std::cout << "Column " << col_name << " not found." << std::endl;
+                    return;
+                }
+                row[col_name] = static_cast<NodeExprIdentifier*>(insertIntoTableStmt->values[i].get())->name;
             }
-        
+            table_data.push_back(row);
+            db_json[table_name]["data"] = table_data;
 
         }
         else {
@@ -107,8 +111,6 @@ void Generator::genStmt(NodeStmt& stmt){
         db_file_out << db_json.dump(4); 
         db_file_out.close();
     }
-    */
-
     else if (NodeStmtUseDatabase* useDbStmt = dynamic_cast<NodeStmtUseDatabase*>(&stmt)){
         std::cout << "USE DATABASE " << static_cast<NodeExprIdentifier*>(useDbStmt->database_name.get())->name << std::endl;
         std::string db_name = static_cast<NodeExprIdentifier*>(useDbStmt->database_name.get())->name;

@@ -60,6 +60,10 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::TABLES});
                     buffer.clear();
                 }
+                else if (buffer == "VALUES"){
+                    tokens.push_back({TokenType::VALUES});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

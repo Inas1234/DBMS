@@ -66,7 +66,6 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE or TABLE"); //treba malo popravit
             }
             break;
-/*
         case TokenType::INSERT:
             consume();
             if (peak().value().type == TokenType::INTO){
@@ -78,24 +77,42 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                     consume();
                     while (peak().value().type != TokenType::RBRACE){
                         std::cout<<"dobro\n";
-                        stmt->values.push_back(parseExpression());
+                        stmt->columns.push_back(parseExpression());
                         if (peak().value().type == TokenType::COMMA){
                             consume();
                         }
                     }
                     consume();
-                    return stmt;
                 }
                 else{
                     throw std::runtime_error("Expected LBRACE");
+                }
+
+                if (peak().value().type == TokenType::VALUES){
+                    consume();
+                    if (peak().value().type == TokenType::LBRACE){
+                        consume();
+                        while (peak().value().type != TokenType::RBRACE){
+                            stmt->values.push_back(parseExpression());
+                            if (peak().value().type == TokenType::COMMA){
+                                consume();
+                            }
+                        }
+                        consume();
+                        return stmt;
+                    }
+                    else{
+                        throw std::runtime_error("Expected LBRACE");
+                    }
+                }
+                else{
+                    throw std::runtime_error("Expected VALUES");
                 }
             }
             else{
                 throw std::runtime_error("Expected INTO");
             }
             break;
- */
-
         case TokenType::SHOW:
             consume();
             if (peak().value().type == TokenType::DATABASES){
