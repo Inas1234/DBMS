@@ -73,10 +73,8 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 std::unique_ptr<NodeStmtInsertIntoTable> stmt = std::make_unique<NodeStmtInsertIntoTable>();
                 stmt->table_name = parseExpression();
                 if (peak().value().type == TokenType::LBRACE){
-                    std::cout<<"dobar if, -> consume\n";
                     consume();
                     while (peak().value().type != TokenType::RBRACE){
-                        std::cout<<"dobro\n";
                         stmt->columns.push_back(parseExpression());
                         if (peak().value().type == TokenType::COMMA){
                             consume();
