@@ -2,9 +2,15 @@
 #include "./src/Tokenizer.h"
 #include "./src/Parser.h"
 #include "./src/Generator.h"
+#include "./src/Menu.h"
+
+
+
 int main() {
     std::string input;
-
+    Menu menu;
+    menu.showMenu();
+    // dodati da se izvrsava samo ako je login uspjesan
 
     while (true) {
         std::cout << "mlinql > ";

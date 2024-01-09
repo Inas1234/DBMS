@@ -140,6 +140,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected DATABASE");
             }
             break;
+            
         case TokenType::ALTER:
             consume();
             if (peak().value().type == TokenType::TABLE){
