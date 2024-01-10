@@ -1,6 +1,6 @@
 #include "User.h"
 #include <fstream>
-#include <json/json.h>
+#include <nlohmann/json.hpp>
 #include <random>
 #include <sstream>
 #include <filesystem>  
@@ -41,14 +41,14 @@ std::string User::getId() const {
 }
 
 void User::saveToFile(const std::string& filename) const {
-    Json::Value userJson;
+    nlohmann::json userJson;
     userJson["id"] = id;
     userJson["username"] = username;
     userJson["password"] = password;  
     userJson["role"] = role;
 
     std::ifstream ifs(filename, std::ifstream::binary);
-    Json::Value usersJson;
+    nlohmann::json usersJson;
 
     if (ifs.good()) {
         ifs >> usersJson;
@@ -62,12 +62,13 @@ void User::saveToFile(const std::string& filename) const {
     ofs.close();
 
 
-    createFolder();
+    createFolder("data");
 }
 
-void User::createFolder() const {
+void User::createFolder(const std::filesystem::path& p) const {
 
-    std::filesystem::create_directory(id);
+    std::filesystem::path folderPath = p / id;
+    std::filesystem::create_directory(folderPath);
     
 }
 
@@ -94,18 +95,18 @@ bool User::authenticateFromFile(const std::string& filename, const std::string& 
 
     for (const User& user : users) {
         if (user.getUsername() == inputUsername && user.decrypt(user.getPassword()) == inputPassword) {
-            std::cout << "Uspešna prijava!\n";
+            std::cout << "Login successful!\n";
             return true;
         }
     }
 
-    std::cout << "Neuspešna prijava.\n";
+    std::cout << "Login unsuccessful.\n";
     return false;
 }
 
 std::vector<User> User::loadUsersFromFile(const std::string& filename) {
     std::ifstream ifs(filename, std::ifstream::binary);
-    Json::Value usersJson;
+    nlohmann::json usersJson;
 
     if (ifs.good()) {
         ifs >> usersJson;
@@ -114,9 +115,9 @@ std::vector<User> User::loadUsersFromFile(const std::string& filename) {
 
     std::vector<User> users;
 
-    for (const auto& id : usersJson.getMemberNames()) {
-        const Json::Value& userJson = usersJson[id];
-        users.emplace_back(userJson["username"].asString(), userJson["password"].asString(), userJson["role"].asString());
+    for (const auto& id : usersJson.items()) {
+        const nlohmann::json& userJson = id.value();
+        users.emplace_back(userJson["username"].get<std::string>(), userJson["password"].get<std::string>(), userJson["role"].get<std::string>());
     }
 
     return users;

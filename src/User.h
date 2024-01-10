@@ -1,6 +1,4 @@
-#ifndef USER_H
-#define USER_H
-
+#pragma once
 #include <string>
 #include <nlohmann/json.hpp>
 
@@ -12,7 +10,7 @@ public:
     std::string getRole() const;
     std::string getId() const;
     void saveToFile(const std::string& filename) const;
-    void createFolder() const;
+    void createFolder(const std::filesystem::path& p) const;
     static bool deleteUser(const std::string& filename, const std::string& userId);
     static std::string encrypt(const std::string& input);
     static std::string decrypt(const std::string& input);
@@ -28,4 +26,3 @@ private:
     static std::vector<User> loadUsersFromFile(const std::string& filename);
 };
 
-#endif // USER_H
