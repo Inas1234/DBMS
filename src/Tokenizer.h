@@ -25,6 +25,8 @@ enum class TokenType{
     ADD,
     DROP,
     COLUMN,
+    STRING,
+    INTEGER,
 };
 
 struct Token {

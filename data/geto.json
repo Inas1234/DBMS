@@ -1,1 +1,30 @@
-{}
+{
+    "ass": {
+        "data": [
+            {
+                "bass": "snigga",
+                "gass": "gnigga"
+            },
+            {
+                "bass": "snigga",
+                "gass": 2
+            }
+        ],
+        "schema": {
+            "bass": "",
+            "gass": ""
+        }
+    },
+    "nesto": {
+        "data": [
+            {
+                "brojGodina": 199,
+                "ime": "Mlinas"
+            }
+        ],
+        "schema": {
+            "brojGodina": "",
+            "ime": ""
+        }
+    }
+}

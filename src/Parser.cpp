@@ -8,7 +8,19 @@ std::unique_ptr<NodeExpr> Parser::parseExpression() {
             return std::make_unique<NodeExprIdentifier>(token.value.value());
         }
     }
-    throw std::runtime_error("Invalid token in parseExpression");  
+    else if (token.type == TokenType::STRING) {
+        if (token.value.has_value()) {
+            return std::make_unique<NodeExprString>(token.value.value());
+        }
+    }
+    else if (token.type == TokenType::INTEGER) {
+        if (token.value.has_value()) {
+            return std::make_unique<NodeExprInteger>(std::stoi(token.value.value()));
+        }
+    }
+    else {
+        throw std::runtime_error("Invalid token in parseExpression");
+    }
 }
 
 

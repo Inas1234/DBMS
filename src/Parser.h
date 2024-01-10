@@ -25,6 +25,28 @@ public:
     }
 };
 
+class NodeExprString : public NodeExpr {
+public:
+    std::string value;
+
+    NodeExprString(const std::string& value) : value(value) {}
+
+    std::unique_ptr<NodeExpr> clone() override{
+        return std::make_unique<NodeExprString>(value);
+    }
+};
+
+class NodeExprInteger : public NodeExpr {
+public:
+    int value;
+
+    NodeExprInteger(int value) : value(value) {}
+
+    std::unique_ptr<NodeExpr> clone() override{
+        return std::make_unique<NodeExprInteger>(value);
+    }
+};
+
 
 
 class NodeStmt {

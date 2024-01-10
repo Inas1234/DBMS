@@ -87,6 +87,32 @@ std::vector<Token> Tokenizer::tokenize(){
                 }
                 
             }
+            else if (isdigit(peak().value())){
+                buffer.push_back(consume());
+                while (peak().has_value() && isdigit(peak().value()))
+                {
+                    buffer.push_back(consume());
+                }
+                std::cout << "INTEGER: " << buffer << std::endl;
+                tokens.push_back({TokenType::INTEGER, buffer});
+                buffer.clear();
+            }
+            else if (peak().value() == '\''){
+                consume();
+                while (peak().has_value() && peak().value() != '\'')
+                {
+                    buffer.push_back(consume());
+                }
+                if (peak().has_value()){
+                    consume();
+                }
+                else{
+                    throw std::runtime_error("Expected '");
+                }
+                std::cout << "STRING: " << buffer << std::endl;
+                tokens.push_back({TokenType::STRING, buffer});
+                buffer.clear();
+            }
             else if (peak().value() == ','){
                 consume();
                 std::cout << "COMMA" << std::endl;
