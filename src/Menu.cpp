@@ -1,25 +1,50 @@
 #include "Menu.h"
+#include "User.h"
 #include <iostream>
 
 void Menu::showMenu() {
     std::cout << "1. Login\n";
-    std::cout << "2. Help [COMMANDS]\n";
-    std::cout << "3. Exit\n";
+    std::cout << "2. Add user\n";       
+    std::cout << "3. Help [COMMANDS]\n";
+    std::cout << "4. Exit\n";
     std::cout << "Enter your option: ";
 
     int opt;
     std::cin >> opt;
     std::cin.ignore();
+    std::string username;
+    std::string password;
+    User user = User(username, password, "user");
 
     switch (opt)
     {
     case 1:
-        //call login func
+        std::cout<<"username: ";
+        std::getline(std::cin, username);
+        std::cout<<"password: ";
+        std::getline(std::cin, password);
+        
+        if (User::authenticateFromFile("users.json", username, password)) {
+            authenticated = true;
+            std::cout<<"Login successful!\n";
+        } else {
+            std::cout << "Wrong username or password!\n";
+            showMenu();
+        }
         break;
     case 2:
-        showHelp();
-        break;
+        std::cout<<"username: ";
+        std::getline(std::cin, username);
+        std::cout<<"password: ";
+        std::getline(std::cin, password);
+        user.saveToFile("users.json");
+        std::cout<<"User added!\n";
+        showMenu();
     case 3:
+        showHelp();
+        showMenu();
+        break;
+    case 4:
         std::cout << "Exiting...\n";
         exit(0);
         break;

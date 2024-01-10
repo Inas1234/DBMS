@@ -9,7 +9,7 @@
 const std::string User::charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 User::User(const std::string& username, const std::string& password, const std::string& role)
-    : id(generateId()), username(username), password(encrypt(password)), role(role) {}
+    : id(generateId()), username(username), password(password), role(role) {}
 
 std::string User::generateId() {
     std::random_device rd;
@@ -44,7 +44,7 @@ void User::saveToFile(const std::string& filename) const {
     nlohmann::json userJson;
     userJson["id"] = id;
     userJson["username"] = username;
-    userJson["password"] = password;  
+    userJson["password"] = encrypt(password);  
     userJson["role"] = role;
 
     std::ifstream ifs(filename, std::ifstream::binary);
@@ -92,15 +92,15 @@ std::string User::decrypt(const std::string& input) {
 
 bool User::authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword) {
     std::vector<User> users = loadUsersFromFile(filename);
-
     for (const User& user : users) {
+
         if (user.getUsername() == inputUsername && user.decrypt(user.getPassword()) == inputPassword) {
             std::cout << "Login successful!\n";
             return true;
         }
     }
 
-    std::cout << "Login unsuccessful.\n";
+    std::cout << "Login failed.\n";
     return false;
 }
 
@@ -117,7 +117,9 @@ std::vector<User> User::loadUsersFromFile(const std::string& filename) {
 
     for (const auto& id : usersJson.items()) {
         const nlohmann::json& userJson = id.value();
-        users.emplace_back(userJson["username"].get<std::string>(), userJson["password"].get<std::string>(), userJson["role"].get<std::string>());
+        users.emplace_back(userJson["username"].get<std::string>(), 
+                           userJson["password"].get<std::string>(), 
+                           userJson["role"].get<std::string>());
     }
 
     return users;

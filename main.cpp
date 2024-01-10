@@ -3,16 +3,17 @@
 #include "./src/Parser.h"
 #include "./src/Generator.h"
 #include "./src/Menu.h"
-
+#include "./src/User.h"
 
 
 int main() {
+
+
     std::string input;
     Menu menu;
     menu.showMenu();
-    // dodati da se izvrsava samo ako je login uspjesan
 
-    while (true) {
+    while (menu.authenticated) {  //dodati logout funkciju, nakon koje se ovo mijenja
         std::cout << "mlinql > ";
         if (!std::getline(std::cin, input)) {
             break;
