@@ -27,6 +27,8 @@ enum class TokenType{
     COLUMN,
     STRING,
     INTEGER,
+    INT_DATA_TYPE,
+    STRING_DATA_TYPE,
 };
 
 struct Token {

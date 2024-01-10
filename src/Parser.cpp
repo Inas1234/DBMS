@@ -36,14 +36,22 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->database_name = parseExpression();
                 return stmt;
             }
-            else if (peak().value().type == TokenType::TABLE){
+            if (peak().value().type == TokenType::TABLE){
                 consume();
                 std::unique_ptr<NodeStmtCreateTable> stmt = std::make_unique<NodeStmtCreateTable>();
                 stmt->table_name = parseExpression();
                 if (peak().value().type == TokenType::LBRACE){
                     consume();
                     while (peak().value().type != TokenType::RBRACE){
-                        stmt->columns.push_back(parseExpression());
+                        stmt->columns.push_back(parseExpression()); // Parse column name
+                        // Parse column data type
+                        Token dataTypeToken = peak().value();
+                        if (dataTypeToken.type == TokenType::INT_DATA_TYPE || dataTypeToken.type == TokenType::STRING_DATA_TYPE) {
+                            stmt->data_types.push_back(dataTypeToken); // Store data type
+                            consume();
+                        } else {
+                            throw std::runtime_error("Expected data type (INT or STRING)");
+                        }
                         if (peak().value().type == TokenType::COMMA){
                             consume();
                         }
@@ -164,6 +172,13 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 if (peak().value().type == TokenType::ADD){
                     consume();
                     stmt->new_column_name = parseExpression();
+                    Token dataTypeToken = peak().value();
+                    if (dataTypeToken.type == TokenType::INT_DATA_TYPE || dataTypeToken.type == TokenType::STRING_DATA_TYPE) {
+                        stmt->data_type = dataTypeToken; 
+                        consume();
+                    } else {
+                        throw std::runtime_error("Expected data type (INT or STRING) for new column");
+                    }
                     return stmt;
                 }
                 else if (peak().value().type == TokenType::DROP){

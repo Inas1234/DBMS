@@ -78,6 +78,7 @@ class NodeStmtCreateTable : public NodeStmt {
 public:
     std::unique_ptr<NodeExpr> table_name;
     std::vector<std::unique_ptr<NodeExpr>> columns;
+    std::vector<Token> data_types;
 };
 
 class NodeStmtUseDatabase : public NodeStmt {
@@ -102,7 +103,7 @@ class NodeStmtAlterTable : public NodeStmt {
 public:
     std::unique_ptr<NodeExpr> table_name;
     std::unique_ptr<NodeExpr> new_column_name;
-
+    Token data_type;
 
 };
 

@@ -57,9 +57,11 @@ void Generator::genStmt(NodeStmt& stmt){
 
             if (db_json.find(table_name) == db_json.end()) {
                 nlohmann::json table_schema;
-                for (auto& col : createTableStmt->columns) {
-                    std::string col_name = static_cast<NodeExprIdentifier*>(col.get())->name;
-                    table_schema[col_name] = ""; 
+                for (size_t i = 0; i < createTableStmt->columns.size(); ++i) {
+                    std::string col_name = static_cast<NodeExprIdentifier*>(createTableStmt->columns[i].get())->name;
+                    Token col_type = createTableStmt->data_types[i]; // Assume this is correctly populated
+                    std::string type_str = (col_type.type == TokenType::INT_DATA_TYPE) ? "int" : "string"; // Map token types to string
+                    table_schema[col_name] = type_str;
                 }
 
                 db_json[table_name] = {
@@ -111,14 +113,12 @@ void Generator::genStmt(NodeStmt& stmt){
 
         
     }
-    
     else if (NodeStmtInsertIntoTable* insertIntoTableStmt = dynamic_cast<NodeStmtInsertIntoTable*>(&stmt)) {
         NodeExpr* tableExpr = genExpr(*(insertIntoTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
             std::string table_name = tableNameExpr->name;
             std::cout << "INSERT INTO TABLE " << table_name << std::endl;
 
-            // Preparing to read from JSON file
             std::ifstream db_file_in("./data/" + m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -143,12 +143,16 @@ void Generator::genStmt(NodeStmt& stmt){
                             return;
                         }
 
-                        if (NodeExprString* valueStringExpr = dynamic_cast<NodeExprString*>(valueExpr)) {
-                            row[col_name] = valueStringExpr->value;
-                        } else if (NodeExprInteger* valueIntExpr = dynamic_cast<NodeExprInteger*>(valueExpr)) {
-                            row[col_name] = valueIntExpr->value;
+                        std::string expected_type = table_schema[col_name];
+                        if ((expected_type == "int" && dynamic_cast<NodeExprInteger*>(valueExpr)) ||
+                            (expected_type == "string" && dynamic_cast<NodeExprString*>(valueExpr))) {
+                            if (NodeExprString* valueStringExpr = dynamic_cast<NodeExprString*>(valueExpr)) {
+                                row[col_name] = valueStringExpr->value;
+                            } else if (NodeExprInteger* valueIntExpr = dynamic_cast<NodeExprInteger*>(valueExpr)) {
+                                row[col_name] = valueIntExpr->value;
+                            }
                         } else {
-                            std::cout << "Invalid type for column " << col_name << std::endl;
+                            std::cout << "Type mismatch for column " << col_name << std::endl;
                             return;
                         }
                     } else {
@@ -240,7 +244,10 @@ void Generator::genStmt(NodeStmt& stmt){
                     std::cout << "Column " << col_name << " already exists." << std::endl;
                     return;
                 }
-                table_schema[col_name] = "";
+                Token col_type = alterTableStmt->data_type; 
+                std::string type_str = (col_type.type == TokenType::INT_DATA_TYPE) ? "int" : "string"; 
+                table_schema[col_name] = type_str;
+
                 db_json[table_name]["schema"] = table_schema;
 
             }

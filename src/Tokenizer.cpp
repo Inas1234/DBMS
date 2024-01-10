@@ -80,6 +80,14 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::COLUMN});
                     buffer.clear();
                 }
+                else if (buffer == "int"){
+                    tokens.push_back({TokenType::INT_DATA_TYPE});
+                    buffer.clear();
+                }
+                else if (buffer == "String"){
+                    tokens.push_back({TokenType::STRING_DATA_TYPE});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});
