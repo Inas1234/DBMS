@@ -200,7 +200,21 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             else{
                 throw std::runtime_error("Expected TABLE");
             }
+        case TokenType::SELECT:
+        {
+            consume();
+            std::unique_ptr<NodeStmtSelect> stmt = std::make_unique<NodeStmtSelect>();
+            while (peak().value().type != TokenType::FROM){
+                stmt->columns.push_back(parseExpression());
+                if (peak().value().type == TokenType::COMMA){
+                    consume();
+                }
+            }
+            consume();
+            stmt->table_name = parseExpression();
+            return stmt;
             break;
+        }
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

@@ -48,7 +48,6 @@ public:
 };
 
 
-
 class NodeStmt {
 public:
     virtual ~NodeStmt() {}
@@ -122,6 +121,13 @@ public:
 class NodeStmtShowTables : public NodeStmt {
 public:
 };
+
+class NodeStmtSelect : public NodeStmt {
+public:
+    std::vector<std::unique_ptr<NodeExpr>> columns;
+    std::unique_ptr<NodeExpr> table_name;
+};
+
 
 
 struct NodeProgram {

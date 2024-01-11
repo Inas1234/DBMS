@@ -29,6 +29,9 @@ enum class TokenType{
     INTEGER,
     INT_DATA_TYPE,
     STRING_DATA_TYPE,
+    SELECT,
+    FROM,
+    STAR
 };
 
 struct Token {

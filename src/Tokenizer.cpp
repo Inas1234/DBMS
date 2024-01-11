@@ -88,6 +88,14 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::STRING_DATA_TYPE});
                     buffer.clear();
                 }
+                else if (buffer == "SELECT"){
+                    tokens.push_back({TokenType::SELECT});
+                    buffer.clear();
+                }
+                else if (buffer == "FROM"){
+                    tokens.push_back({TokenType::FROM});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});
@@ -135,6 +143,10 @@ std::vector<Token> Tokenizer::tokenize(){
                 consume();
                 std::cout << "RBRACE" << std::endl;
                 tokens.push_back({TokenType::RBRACE});
+            }
+            else if (peak().value() == '*'){
+                consume();
+                tokens.push_back({TokenType::IDENTIFIER, "*"});
             }
             else if (isspace(peak().value())){
                 consume();

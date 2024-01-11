@@ -298,6 +298,71 @@ void Generator::genStmt(NodeStmt& stmt){
         db_file_out << db_json.dump(4); 
         db_file_out.close();
     }
+    else if (NodeStmtSelect* selectStmt = dynamic_cast<NodeStmtSelect*>(&stmt)){
+        std::cout << "SELECT" << std::endl;
+
+        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        nlohmann::json db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
+        db_file_in.close();
+
+        std::string table_name = static_cast<NodeExprIdentifier*>(selectStmt->table_name.get())->name;
+        if (db_json.find(table_name) != db_json.end()) {
+            nlohmann::json table_schema = db_json[table_name]["schema"];
+            nlohmann::json table_data = db_json[table_name]["data"];
+
+            std::vector<std::string> col_names;
+            for (auto& colName : table_schema.items()) {
+                col_names.push_back(colName.key());
+            }
+
+            std::vector<std::string> select_col_names;
+
+            if (selectStmt->columns.size() == 1 && dynamic_cast<NodeExprIdentifier*>(selectStmt->columns.front().get())->name == "*") {
+                select_col_names = col_names;
+            } else {
+                for (auto& colExpr : selectStmt->columns) {
+                    NodeExpr* colExprPtr = genExpr(*colExpr);
+                    if (NodeExprIdentifier* colNameExpr = dynamic_cast<NodeExprIdentifier*>(colExprPtr)) {
+                        std::string col_name = colNameExpr->name;
+                        if (std::find(col_names.begin(), col_names.end(), col_name) != col_names.end()) {
+                            select_col_names.push_back(col_name);
+                        } else {
+                            std::cout << "Column " << col_name << " not found in schema." << std::endl;
+                            return;
+                        }
+                    } else {
+                        std::cout << "Invalid type for column identifier" << std::endl;
+                        return;
+                    }
+                }
+            }
+
+            const int col_width = 20; 
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+            std::cout << std::setw(col_width) << std::left << "TABLE" << " | ";
+            for (auto& col_name : select_col_names) {
+                std::cout << std::setw(col_width) << std::left << col_name << " | ";
+            }
+            std::cout << std::endl;
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+
+            for (auto& row : table_data) {
+                std::cout << std::setw(col_width) << std::left << table_name << " | ";
+                for (auto& col_name : select_col_names) {
+                    std::cout << std::setw(col_width) << std::left << row[col_name].dump() << " | ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+
+        } else {
+            std::cout << "Table " << table_name << " not found." << std::endl;
+        }
+    }
+
     else{
         throw std::runtime_error("Invalid statement");
     }
