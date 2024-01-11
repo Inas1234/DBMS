@@ -1,10 +1,10 @@
-#include "User.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <random>
 #include <sstream>
 #include <filesystem>  
 #include <iostream>
+#include "User.h"
 
 const std::string User::charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -73,27 +73,35 @@ void User::createFolder(const std::filesystem::path& p) const {
 }
 
 std::string User::encrypt(const std::string& input) {
+    static const int shift = 1; // Add a static member variable shift
     
     std::string result = input;
     for (char& c : result) {
-        c = charset[(c + 1) % charset.size()];
+        size_t pos = charset.find(c);
+        if (pos != std::string::npos) {
+            c = charset[(pos + shift) % charset.size()]; // Use the static member variable shift
+        }
     }
     return result;
 }
 
 std::string User::decrypt(const std::string& input) {
-    
+    static const int shift = 1; // Add a static member variable shift
+
     std::string result = input;
-    for (char& c : result) {
-        c = charset[(c - 1 + charset.size()) % charset.size()];
-    }
+        for (char& c : result) {
+            size_t pos = charset.find(c);
+            if (pos != std::string::npos) {
+                c = charset[(pos - shift + charset.size()) % charset.size()];
+            }
+        }
     return result;
 }
 
 bool User::authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword) {
     std::vector<User> users = loadUsersFromFile(filename);
     for (const User& user : users) {
-
+        std::cout << user.getUsername() << " " << user.decrypt(user.getPassword()) << std::endl;
         if (user.getUsername() == inputUsername && user.decrypt(user.getPassword()) == inputPassword) {
             std::cout << "Login successful!\n";
             return true;

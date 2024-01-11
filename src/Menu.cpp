@@ -1,6 +1,7 @@
 #include "Menu.h"
 #include "User.h"
 #include <iostream>
+#include <memory>
 
 void Menu::showMenu() {
     std::cout << "1. Login\n";
@@ -19,27 +20,33 @@ void Menu::showMenu() {
     switch (opt)
     {
     case 1:
-        std::cout<<"username: ";
+    {
+        std::cout << "username: ";
         std::getline(std::cin, username);
-        std::cout<<"password: ";
+        std::cout << "password: ";
         std::getline(std::cin, password);
-        
+
         if (User::authenticateFromFile("users.json", username, password)) {
             authenticated = true;
-            std::cout<<"Login successful!\n";
+            std::cout << "Login successful!\n";
         } else {
             std::cout << "Wrong username or password!\n";
             showMenu();
         }
         break;
+    }
     case 2:
-        std::cout<<"username: ";
+    {
+        std::cout << "username: ";
         std::getline(std::cin, username);
-        std::cout<<"password: ";
+        std::cout << "password: ";
         std::getline(std::cin, password);
-        user.saveToFile("users.json");
-        std::cout<<"User added!\n";
+        std::unique_ptr<User> user = std::make_unique<User>(username, password, "user");
+        user->saveToFile("users.json");
+        std::cout << "User added!\n";
         showMenu();
+        break;
+    }
     case 3:
         showHelp();
         showMenu();
@@ -48,7 +55,7 @@ void Menu::showMenu() {
         std::cout << "Exiting...\n";
         exit(0);
         break;
-    
+
     default:
         break;
     }

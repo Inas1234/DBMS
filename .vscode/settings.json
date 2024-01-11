@@ -91,6 +91,8 @@
     "stack": "cpp",
     "any": "cpp",
     "codecvt": "cpp",
-    "forward_list": "cpp"
+    "forward_list": "cpp",
+    "filesystem": "cpp",
+    "shared_mutex": "cpp"
   }
 }
