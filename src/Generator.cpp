@@ -4,6 +4,8 @@
 std::string m_db_name;
 
 
+
+
 NodeExpr* Generator::genExpr(NodeExpr& expr){
     if (NodeExprIdentifier* id = dynamic_cast<NodeExprIdentifier*>(&expr)){
         return id;
@@ -13,6 +15,9 @@ NodeExpr* Generator::genExpr(NodeExpr& expr){
     }
     else if (NodeExprInteger* intgr = dynamic_cast<NodeExprInteger*>(&expr)){
         return intgr;
+    }
+    else if (NodeExprBinary* bin = dynamic_cast<NodeExprBinary*>(&expr)){
+        return bin;
     }
     else{
         throw std::runtime_error("Invalid expression");
@@ -362,7 +367,112 @@ void Generator::genStmt(NodeStmt& stmt){
             std::cout << "Table " << table_name << " not found." << std::endl;
         }
     }
+    else if (NodeStmtSelectWhere * selectWhereStmt = dynamic_cast<NodeStmtSelectWhere*>(&stmt)){
+        
+        std::cout << "SELECT WHERE" << std::endl;
 
+        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        nlohmann::json db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
+        db_file_in.close();
+
+        std::string table_name = static_cast<NodeExprIdentifier*>(selectWhereStmt->table_name.get())->name;
+        if (db_json.find(table_name) != db_json.end()) {
+            nlohmann::json table_schema = db_json[table_name]["schema"];
+            nlohmann::json table_data = db_json[table_name]["data"];
+
+            // ... [Rest of the code in this block remains unchanged] ...
+
+            // Get column names
+            std::vector<std::string> col_names;
+            for (auto& colName : table_schema.items()) {
+                col_names.push_back(colName.key());
+            }
+
+
+
+            // Evaluate WHERE condition
+            std::string where_col_name = static_cast<NodeExprIdentifier*>(selectWhereStmt->where_column.get())->name;
+            NodeExpr* where_value_expr = genExpr(*selectWhereStmt->where_value);
+            std::string where_value = where_value_expr->toString(); // Assuming you have a toString method
+            TokenType where_op = selectWhereStmt->where_op.type;
+            std::cout << "WHERE " << where_col_name << " " << where_value << std::endl;
+
+            std::vector<nlohmann::json> filtered_rows;
+            for (auto& row : table_data) {
+                std::string row_col_value = row[where_col_name].dump();
+                // check if row[where_col_name] has quatation marks
+                if (row_col_value[0] == '"') {
+                    row_col_value = row[where_col_name].dump().substr(1, row[where_col_name].dump().size() - 2);
+                }
+                else {
+                    row_col_value = row[where_col_name].dump();
+                }
+                if (where_op == TokenType::EQUALS){
+                    if (row_col_value == where_value) {
+                        filtered_rows.push_back(row);
+                    }
+                }
+                else if (where_op == TokenType::NOT_EQUAL){
+                    if (row_col_value != where_value) {
+                        filtered_rows.push_back(row);
+                    }
+                }
+            }
+
+            // Print results
+            std::vector<std::string> select_col_names;
+
+            if (selectWhereStmt->columns.size() == 1 && dynamic_cast<NodeExprIdentifier*>(selectWhereStmt->columns.front().get())->name == "*") {
+                select_col_names = col_names;
+            } else {
+                for (auto& colExpr : selectWhereStmt->columns) {
+                    NodeExpr* colExprPtr = genExpr(*colExpr);
+                    if (NodeExprIdentifier* colNameExpr = dynamic_cast<NodeExprIdentifier*>(colExprPtr)) {
+                        std::string col_name = colNameExpr->name;
+                        if (std::find(col_names.begin(), col_names.end(), col_name) != col_names.end()) {
+                            select_col_names.push_back(col_name);
+                        } else {
+                            std::cout << "Column " << col_name << " not found in schema." << std::endl;
+                            return;
+                        }
+                    } else {
+                        std::cout << "Invalid type for column identifier" << std::endl;
+                        return;
+                    }
+                }
+            }
+
+            // Make sure you use the filtered rows here
+            const int col_width = 20;
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+            std::cout << std::setw(col_width) << std::left << "TABLE" << " | ";
+            for (auto& col_name : select_col_names) {
+                std::cout << std::setw(col_width) << std::left << col_name << " | ";
+            }
+            std::cout << std::endl;
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+
+            for (auto& row : filtered_rows) {
+                std::cout << std::setw(col_width) << std::left << table_name << " | ";
+                for (auto& col_name : select_col_names) {
+                    std::cout << std::setw(col_width) << std::left << row[col_name].dump() << " | ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
+
+        
+            // ... [Rest of the code in this block remains unchanged] ...
+        } else {
+            std::cout << "Table " << table_name << " not found." << std::endl;
+        }
+
+
+
+    }
     else{
         throw std::runtime_error("Invalid statement");
     }

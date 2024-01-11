@@ -96,6 +96,14 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::FROM});
                     buffer.clear();
                 }
+                else if (buffer == "WHERE"){
+                    tokens.push_back({TokenType::WHERE});
+                    buffer.clear();
+                }
+                else if (buffer == "AND"){
+                    tokens.push_back({TokenType::AND});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});
@@ -147,6 +155,15 @@ std::vector<Token> Tokenizer::tokenize(){
             else if (peak().value() == '*'){
                 consume();
                 tokens.push_back({TokenType::IDENTIFIER, "*"});
+            }
+            else if (peak().value() == '='){
+                consume();
+                tokens.push_back({TokenType::EQUALS});
+            }
+            else if (peak().value() == '!' && peak(1).value() == '='){
+                consume();
+                consume();
+                tokens.push_back({TokenType::NOT_EQUAL});
             }
             else if (isspace(peak().value())){
                 consume();

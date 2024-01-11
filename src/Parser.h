@@ -12,6 +12,9 @@ class NodeExpr {
 public:
     virtual ~NodeExpr() {}
     virtual std::unique_ptr<NodeExpr> clone() = 0;
+    virtual std::string toString(){
+        return "NodeExpr";
+    }  
 };
 
 class NodeExprIdentifier : public NodeExpr {
@@ -23,6 +26,11 @@ public:
     std::unique_ptr<NodeExpr> clone() override{
         return std::make_unique<NodeExprIdentifier>(name);
     }
+
+    std::string toString() override{
+        return name;
+    }
+
 };
 
 class NodeExprString : public NodeExpr {
@@ -45,8 +53,24 @@ public:
     std::unique_ptr<NodeExpr> clone() override{
         return std::make_unique<NodeExprInteger>(value);
     }
+
+    std::string toString() override{
+        return std::to_string(value);
+    }
 };
 
+class NodeExprBinary : public NodeExpr {
+public:
+    std::unique_ptr<NodeExpr> left;
+    std::unique_ptr<NodeExpr> right;
+    Token op;
+
+    NodeExprBinary(std::unique_ptr<NodeExpr> left, std::unique_ptr<NodeExpr> right, Token op) : left(std::move(left)), right(std::move(right)), op(op) {}
+
+    std::unique_ptr<NodeExpr> clone() override{
+        return std::make_unique<NodeExprBinary>(left->clone(), right->clone(), op);
+    }
+};
 
 class NodeStmt {
 public:
@@ -126,6 +150,26 @@ class NodeStmtSelect : public NodeStmt {
 public:
     std::vector<std::unique_ptr<NodeExpr>> columns;
     std::unique_ptr<NodeExpr> table_name;
+};
+
+class NodeStmtSelectWhere : public NodeStmt {
+public:
+    std::vector<std::unique_ptr<NodeExpr>> columns;
+    std::unique_ptr<NodeExpr> table_name;
+    std::unique_ptr<NodeExpr> where_column;
+    std::unique_ptr<NodeExpr> where_value;
+    Token where_op;
+
+    void print() override{
+        std::cout << "NodeStmtSelectWhere" << std::endl;
+        std::cout << "Columns: " << std::endl;
+        for (auto& col : columns){
+            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name << std::endl;
+        }
+        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
+        std::cout << "Where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
+        std::cout << "Where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
+    }
 };
 
 

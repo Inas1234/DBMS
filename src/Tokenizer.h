@@ -31,7 +31,10 @@ enum class TokenType{
     STRING_DATA_TYPE,
     SELECT,
     FROM,
-    STAR
+    WHERE,
+    EQUALS,
+    AND,
+    NOT_EQUAL,
 };
 
 struct Token {

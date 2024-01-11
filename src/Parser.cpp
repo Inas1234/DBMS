@@ -18,6 +18,11 @@ std::unique_ptr<NodeExpr> Parser::parseExpression() {
             return std::make_unique<NodeExprInteger>(std::stoi(token.value.value()));
         }
     }
+    else if (token.type == TokenType::EQUALS || token.type == TokenType::NOT_EQUAL) {
+        std::unique_ptr<NodeExpr> left = parseExpression();
+        std::unique_ptr<NodeExpr> right = parseExpression();
+        return std::make_unique<NodeExprBinary>(std::move(left), std::move(right), token);
+    }
     else {
         throw std::runtime_error("Invalid token in parseExpression");
     }
@@ -202,19 +207,45 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             }
         case TokenType::SELECT:
         {
-            consume();
+            consume(); // Consume SELECT token
             std::unique_ptr<NodeStmtSelect> stmt = std::make_unique<NodeStmtSelect>();
-            while (peak().value().type != TokenType::FROM){
+            std::unique_ptr<NodeStmtSelectWhere> stmt2 = std::make_unique<NodeStmtSelectWhere>();
+
+            while (peak().has_value() && peak()->type != TokenType::FROM){
                 stmt->columns.push_back(parseExpression());
-                if (peak().value().type == TokenType::COMMA){
+                stmt2->columns.push_back(stmt->columns.back()->clone());
+                if (peak().has_value() && peak()->type == TokenType::COMMA){
                     consume();
                 }
             }
-            consume();
+            if (!peak().has_value()) {
+                throw std::runtime_error("Unexpected end of input: Expected FROM");
+            }
+            consume(); // Consume FROM token
             stmt->table_name = parseExpression();
-            return stmt;
-            break;
+            stmt2->table_name = stmt->table_name->clone();
+
+            if (peak().has_value() && peak()->type == TokenType::WHERE){
+                consume(); // Consume WHERE token
+
+                stmt2->where_column = parseExpression();
+
+                if (peak().has_value() && (peak()->type == TokenType::EQUALS || peak()->type == TokenType::NOT_EQUAL)){
+                    stmt2->where_op = peak().value();
+                    consume(); // Consume the operator token
+
+                    stmt2->where_value = parseExpression();
+                    return stmt2; // Return SELECT WHERE statement
+                }
+                else{
+                    throw std::runtime_error("Expected EQUALS or NOT_EQUAL after WHERE column");
+                }
+            }
+            else {
+                return stmt; // Return regular SELECT statement
+            }
         }
+
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }
