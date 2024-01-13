@@ -143,8 +143,8 @@ std::vector<std::pair<std::string, User>> User::loadUsersFromFile(const std::str
 
 void User::setWorkDir(const std::string& foldername){
     std::filesystem::current_path("./data/"+foldername+"/");
-    std::filesystem::path currentPath = std::filesystem::current_path();
-    std::cout<<"current path: "<<currentPath<<std::endl;
+    //std::filesystem::path currentPath = std::filesystem::current_path();
+    //std::cout<<"current path: "<<currentPath<<std::endl;
 }
 
 bool User::checkIfCurrentUserAdmin(){
@@ -175,3 +175,37 @@ bool User::checkIfCurrentUserAdmin(){
     return false;
 }
 
+bool User::deleteUser(const std::string& filename, const std::string& userId){
+    bool check;
+    if(checkIfCurrentUserAdmin){
+        std::cout<<"Are you sure you want to delete this user? (y/n)"<<std::endl;
+        std::string answer;
+        std::cin>>answer;
+        if(answer == "y")check = true; 
+        else check = false;
+
+        if(check){
+            std::ifstream ifs(filename, std::ifstream::binary);
+            nlohmann::json usersJson;
+
+            if (ifs.good()) {
+                ifs >> usersJson;
+                ifs.close();
+            }
+
+            usersJson.erase(userId);
+
+            std::ofstream ofs(filename, std::ofstream::trunc);
+            ofs << usersJson;
+            ofs.close();
+
+            std::filesystem::remove_all("../../data/"+userId);
+            return true;
+        } else{
+            return false;
+        }
+    } else{
+        std::cout<<"You don't have permission to delete this user!"<<std::endl;
+        return false;
+    }
+}

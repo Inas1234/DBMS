@@ -2,6 +2,7 @@
 #include <string>
 #include <filesystem>
 #include "User.h"
+#include "Menu.h"
 std::string m_db_name;
 
 
@@ -481,15 +482,32 @@ void Generator::genStmt(NodeStmt& stmt){
             std::unique_ptr<User> user = std::make_unique<User>(username, password, role);
 
             user->saveToFile("../../users.json");
-
         }
         else{
             std::cout << "Only admin can create users" << std::endl;
+        }
+        
+    }
+    else if (NodeStmtLogout *stmtLogout = dynamic_cast<NodeStmtLogout*>(&stmt)){
+        std::cout << "LOGOUT" << std::endl;
+        std::filesystem::current_path("../../");
+        m_db_name = "";
+        exit(0);
+    }
+    else if (NodeStmtDeleteUser *stmtDeleteUser = dynamic_cast<NodeStmtDeleteUser*>(&stmt)){
+        if (User::checkIfCurrentUserAdmin()){
+            std::string username = static_cast<NodeExprIdentifier*>(stmtDeleteUser->username.get())->name;
+            std::cout << "DELETE USER " << username << std::endl;
+            User::deleteUser("../../users.json", username);
+        }
+        else{
+            std::cout << "Only admin can delete users" << std::endl;
         }
     }
     else{
         throw std::runtime_error("Invalid statement");
     }
+
 }
 
 void Generator::Generate(){

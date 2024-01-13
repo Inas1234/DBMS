@@ -179,6 +179,15 @@ public:
     std::unique_ptr<NodeExpr> role;
 };
 
+class NodeStmtDeleteUser : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> username;
+};
+
+class NodeStmtLogout : public NodeStmt {
+public:
+};
+
 
 struct NodeProgram {
     std::vector<std::unique_ptr<NodeStmt>> statements;

@@ -120,11 +120,16 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::ROLE});
                     buffer.clear();
                 }
+                else if (buffer == "LOGOUT"){
+                    tokens.push_back({TokenType::LOGOUT});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});
                     buffer.clear();
                 }
+
                 
             }
             else if (isdigit(peak().value())){

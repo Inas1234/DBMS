@@ -113,10 +113,17 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->table_name = parseExpression();
                 return stmt;
             }
+            else if(peak().value().type == TokenType::USER){
+                consume();
+                std::unique_ptr<NodeStmtDeleteUser> stmt = std::make_unique<NodeStmtDeleteUser>();
+                stmt->username = parseExpression();
+                return stmt;
+            }
             else{
                 throw std::runtime_error("Expected DATABASE or TABLE"); //treba malo popravit
             }
             break;
+
         case TokenType::INSERT:
             consume();
             if (peak().value().type == TokenType::INTO){
@@ -162,6 +169,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 throw std::runtime_error("Expected INTO");
             }
             break;
+
         case TokenType::SHOW:
             consume();
             if (peak().value().type == TokenType::DATABASES){
@@ -271,7 +279,13 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 return stmt; // Return regular SELECT statement
             }
         }
-
+        case TokenType::LOGOUT:{
+            consume();
+            std::unique_ptr<NodeStmtLogout> stmt = std::make_unique<NodeStmtLogout>();
+            return stmt;
+            break;
+        }
+        
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

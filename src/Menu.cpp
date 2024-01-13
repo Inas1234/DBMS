@@ -4,10 +4,10 @@
 #include <memory>
 
 void Menu::showMenu() {
+    system("clear");
     std::cout << "1. Login\n";
-    std::cout << "2. Add user\n";       
-    std::cout << "3. Help [COMMANDS]\n";
-    std::cout << "4. Exit\n";
+    std::cout << "2. Help [COMMANDS]\n";
+    std::cout << "3. Exit\n";
     std::cout << "Enter your option: ";
 
     int opt;
@@ -27,28 +27,22 @@ void Menu::showMenu() {
         std::getline(std::cin, password);
 
         currentId = user.authenticateFromFile("users.json", username, password);
-        authenticated=true; 
-        user.setWorkDir(currentId);
-
+        
+        if(!currentId.empty()){
+            authenticated=true; 
+            user.setWorkDir(currentId);
+        } else{
+            authenticated=false;
+            system("clear");
+            std::cout << "Wrong username or password!\n";
+            showMenu();
+        }
         break;
     }
     case 2:
-    {
-        std::cout << "username: ";
-        std::getline(std::cin, username);
-        std::cout << "password: ";
-        std::getline(std::cin, password);
-        std::unique_ptr<User> user = std::make_unique<User>(username, password, "user");
-        user->saveToFile("users.json");
-        std::cout << "User added!\n";
-        showMenu();
-        break;
-    }
-    case 3:
         showHelp();
-        showMenu();
         break;
-    case 4:
+    case 3:
         std::cout << "Exiting...\n";
         exit(0);
         break;
@@ -87,5 +81,16 @@ void Menu::showHelp() {
 
     std::cout << "~ SHOW DATABASES\n";
     std::cout << "~ SHOW TABLES (for the current database)\n\n";
+   
+    std::cout << "~ LOGOUT\n";
+   
+    std::cout << "~ admin commands:\n";
+    std::cout << "~ CREATE USER [username] IDENTIFIED BY [password] ROLE [role]\n";
+    std::cout << "~ DELETE USER [username]";
+    
+    std::cout << "press any key to close Help\n";
+    std::cin.ignore();
+    showMenu();
+
 }
 

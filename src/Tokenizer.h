@@ -38,7 +38,8 @@ enum class TokenType{
     USER,
     IDENTIFIED,
     BY,
-    ROLE
+    ROLE,
+    LOGOUT
 };
 
 struct Token {
