@@ -25,6 +25,11 @@ int main() {
             std::unique_ptr<NodeProgram> program = parser.parseProgram();
             Generator generator(std::move(program));
             generator.Generate();
+            if (generator.isLoggedOut()) {
+                menu.authenticated = false;
+                menu.showMenu();
+            }
+
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
         }

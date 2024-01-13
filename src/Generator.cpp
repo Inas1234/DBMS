@@ -492,7 +492,8 @@ void Generator::genStmt(NodeStmt& stmt){
         std::cout << "LOGOUT" << std::endl;
         std::filesystem::current_path("../../");
         m_db_name = "";
-        exit(0);
+        m_loggedOut = true;
+        return;
     }
     else if (NodeStmtDeleteUser *stmtDeleteUser = dynamic_cast<NodeStmtDeleteUser*>(&stmt)){
         if (User::checkIfCurrentUserAdmin()){

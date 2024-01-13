@@ -13,6 +13,8 @@ public:
     void genStmt(NodeStmt& stmt);
     NodeExpr* genExpr(NodeExpr& expr);
     void Generate();
+    bool isLoggedOut() { return m_loggedOut; }
 private:
     std::unique_ptr<NodeProgram> m_prog;
+    bool m_loggedOut = false;
 };

@@ -162,7 +162,6 @@ bool User::checkIfCurrentUserAdmin(){
     }
 
     for (const auto& entry : usersJson.items()) {
-        std::cout << entry.value() << std::endl;
         const std::string& id = entry.key();
         const nlohmann::json& userJson = entry.value();
         if (id == userId){
@@ -181,9 +180,11 @@ bool User::deleteUser(const std::string& filename, const std::string& userId){
         std::cout<<"Are you sure you want to delete this user? (y/n)"<<std::endl;
         std::string answer;
         std::cin>>answer;
+        std::cin.ignore();
+
         if(answer == "y")check = true; 
         else check = false;
-
+        
         if(check){
             std::ifstream ifs(filename, std::ifstream::binary);
             nlohmann::json usersJson;
@@ -193,7 +194,11 @@ bool User::deleteUser(const std::string& filename, const std::string& userId){
                 ifs.close();
             }
 
-            usersJson.erase(userId);
+            for (const auto& entry : usersJson.items()) {
+                if (entry.value()["username"] == userId){
+                    usersJson.erase(entry.key());
+                }
+            }
 
             std::ofstream ofs(filename, std::ofstream::trunc);
             ofs << usersJson;
