@@ -17,6 +17,7 @@ public:
     static std::string authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword);
     static std::vector<std::pair<std::string, User>> loadUsersFromFile(const std::string& filename);
     static void setWorkDir(const std::string& foldername);
+    static bool checkIfCurrentUserAdmin();
 
 private:
     std::string generateId(); 

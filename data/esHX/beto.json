@@ -1,0 +1,20 @@
+{
+    "nesto": {
+        "data": [],
+        "schema": {
+            "a": "int"
+        }
+    },
+    "something": {
+        "data": [
+            {
+                "godine": 20,
+                "ime": "inas"
+            }
+        ],
+        "schema": {
+            "godine": "int",
+            "ime": "string"
+        }
+    }
+}

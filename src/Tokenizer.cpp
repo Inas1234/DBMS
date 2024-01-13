@@ -104,6 +104,22 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::AND});
                     buffer.clear();
                 }
+                else if (buffer == "USER"){
+                    tokens.push_back({TokenType::USER});
+                    buffer.clear();
+                }
+                else if (buffer == "IDENTIFIED"){
+                    tokens.push_back({TokenType::IDENTIFIED});
+                    buffer.clear();
+                }
+                else if (buffer == "BY"){
+                    tokens.push_back({TokenType::BY});
+                    buffer.clear();
+                }
+                else if (buffer == "ROLE"){
+                    tokens.push_back({TokenType::ROLE});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

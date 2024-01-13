@@ -35,6 +35,10 @@ enum class TokenType{
     EQUALS,
     AND,
     NOT_EQUAL,
+    USER,
+    IDENTIFIED,
+    BY,
+    ROLE
 };
 
 struct Token {

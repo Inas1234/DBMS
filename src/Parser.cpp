@@ -41,7 +41,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 stmt->database_name = parseExpression();
                 return stmt;
             }
-            if (peak().value().type == TokenType::TABLE){
+            else if (peak().value().type == TokenType::TABLE){
                 consume();
                 std::unique_ptr<NodeStmtCreateTable> stmt = std::make_unique<NodeStmtCreateTable>();
                 stmt->table_name = parseExpression();
@@ -68,8 +68,34 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                     throw std::runtime_error("Expected LBRACE");
                 }
             }
+            else if (peak().value().type == TokenType::USER){
+                consume();
+                std::unique_ptr<NodeStmtCreateUser> stmt = std::make_unique<NodeStmtCreateUser>();
+                stmt->username = parseExpression();
+                if (peak().value().type == TokenType::IDENTIFIED){
+                    consume();
+                    if (peak().value().type == TokenType::BY){
+                        consume();
+                        stmt->password = parseExpression();
+                    }
+                    else{
+                        throw std::runtime_error("Expected BY");
+                    }
+                }
+                else{
+                    throw std::runtime_error("Expected IDENTIFIED");
+                }
+                if (peak().value().type == TokenType::ROLE){
+                    consume();
+                    stmt->role = parseExpression();
+                    return stmt;
+                }
+                else{
+                    throw std::runtime_error("Expected ROLE");
+                }
+            }
             else{
-                throw std::runtime_error("Expected DATABASE");
+                throw std::runtime_error("Expected DATABASE or TABLE or USER");
             }
             break;
         

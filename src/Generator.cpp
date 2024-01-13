@@ -1,6 +1,7 @@
 #include "Generator.h"
 #include <string>
 #include <filesystem>
+#include "User.h"
 std::string m_db_name;
 
 
@@ -192,19 +193,19 @@ void Generator::genStmt(NodeStmt& stmt){
     }
     else if(NodeStmtShowDatabases* showDbStmt = dynamic_cast<NodeStmtShowDatabases*>(&stmt)){
         //std::cout << std::setw(20) << std::left << "List of Databases" << std::endl;
-        std::cout << "-------------------------------------------" << std::endl;
+            std::cout << "-------------------------------------------" << std::endl;
 
-        const std::string currentPath = std::filesystem::current_path(); // Get the current working directory
-        std::cout << std::setw(20) << std::left << "Name" << " | " << std::setw(10) << "Owner" << std::endl;    // DODATNO NAPRAVITI USER SISTEM I AUTENTIFIKACIJU KORISNIKA
-        std::cout << "-------------------------------------------" << std::endl;
+            const std::string currentPath = std::filesystem::current_path().string(); // Get the current working directory as a string
+            std::cout << std::setw(20) << std::left << "Name" << " | " << std::setw(10) << "Owner" << std::endl;    // DODATNO NAPRAVITI USER SISTEM I AUTENTIFIKACIJU KORISNIKA
+            std::cout << "-------------------------------------------" << std::endl;
 
-        
-    for (const auto& entry : std::filesystem::directory_iterator(currentPath)) {
-        if (entry.is_regular_file() && entry.path().extension() == ".json") {
-            std::cout << std::setw(20) << std::left << entry.path().stem().string() << " | " << std::setw(10) << "current" << std::endl;
+            
+        for (const auto& entry : std::filesystem::directory_iterator(currentPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".json") {
+                std::cout << std::setw(20) << std::left << entry.path().stem().string() << " | " << std::setw(10) << "current" << std::endl;
+            }
         }
-    }
-        std::cout << "-------------------------------------------" << std::endl;
+            std::cout << "-------------------------------------------" << std::endl;
     }
 
     else if(NodeStmtShowTables* showTableStmt = dynamic_cast<NodeStmtShowTables*>(&stmt)){
@@ -470,9 +471,21 @@ void Generator::genStmt(NodeStmt& stmt){
         } else {
             std::cout << "Table " << table_name << " not found." << std::endl;
         }
+    }
+    else if (NodeStmtCreateUser *stmtCreateUser = dynamic_cast<NodeStmtCreateUser*>(&stmt)){
+        if (User::checkIfCurrentUserAdmin()){
+            std::string username = static_cast<NodeExprIdentifier*>(stmtCreateUser->username.get())->name;
+            std::string password = static_cast<NodeExprString*>(stmtCreateUser->password.get())->value;
+            std::string role = static_cast<NodeExprIdentifier*>(stmtCreateUser->role.get())->name;
+            std::cout << "CREATE USER " << username << " " << password << " " << role << std::endl;
+            std::unique_ptr<User> user = std::make_unique<User>(username, password, role);
 
+            user->saveToFile("../../users.json");
 
-
+        }
+        else{
+            std::cout << "Only admin can create users" << std::endl;
+        }
     }
     else{
         throw std::runtime_error("Invalid statement");

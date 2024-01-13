@@ -172,6 +172,12 @@ public:
     }
 };
 
+class NodeStmtCreateUser : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> username;
+    std::unique_ptr<NodeExpr> password;
+    std::unique_ptr<NodeExpr> role;
+};
 
 
 struct NodeProgram {

@@ -62,7 +62,7 @@ void User::saveToFile(const std::string& filename) const {
     ofs.close();
 
 
-    createFolder("data");
+    createFolder("../../data");
 }
 
 void User::createFolder(const std::filesystem::path& p) const {
@@ -117,8 +117,6 @@ std::string User::authenticateFromFile(const std::string& filename, const std::s
     return "";  // Return an empty string to indicate failure
 }
 
-
-
 std::vector<std::pair<std::string, User>> User::loadUsersFromFile(const std::string& filename) {
     std::ifstream ifs(filename, std::ifstream::binary);
     nlohmann::json usersJson;
@@ -147,5 +145,33 @@ void User::setWorkDir(const std::string& foldername){
     std::filesystem::current_path("./data/"+foldername+"/");
     std::filesystem::path currentPath = std::filesystem::current_path();
     std::cout<<"current path: "<<currentPath<<std::endl;
+}
+
+bool User::checkIfCurrentUserAdmin(){
+    std::filesystem::path currentPath = std::filesystem::current_path();
+    std::string path = currentPath.string();
+    size_t separatorPos = path.find_last_of("/\\");
+    std::string userId = path.substr(separatorPos + 1);
+
+    std::ifstream ifs("../../users.json", std::ifstream::binary);
+    nlohmann::json usersJson;
+
+    if (ifs.good()) {
+        ifs >> usersJson;
+        ifs.close();
+    }
+
+    for (const auto& entry : usersJson.items()) {
+        std::cout << entry.value() << std::endl;
+        const std::string& id = entry.key();
+        const nlohmann::json& userJson = entry.value();
+        if (id == userId){
+            if (userJson["role"].get<std::string>() == "admin"){
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
