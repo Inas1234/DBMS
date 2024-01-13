@@ -30,7 +30,7 @@ void Generator::genStmt(NodeStmt& stmt){
         if (NodeExprIdentifier* dbNameExpr = dynamic_cast<NodeExprIdentifier*>(expr)) {
             std::cout << "CREATE DATABASE " << dbNameExpr->name << std::endl;
             std::string db_name = dbNameExpr->name;
-            std::ofstream db_file( "./data/"+ db_name + ".json");
+            std::ofstream db_file(db_name + ".json");
             db_file << "{}";
         }
         else {
@@ -42,7 +42,7 @@ void Generator::genStmt(NodeStmt& stmt){
         if (NodeExprIdentifier* dbNameExpr = dynamic_cast<NodeExprIdentifier*>(expr)) {
             std::string db_name = dbNameExpr->name;
             std::cout << "DELETE DATABASE " << db_name << std::endl;
-            std::remove(("./data/"+ db_name + ".json").c_str());
+            std::remove((db_name + ".json").c_str());
         }
         else {
             throw std::runtime_error("Expected NodeExprIdentifier for database name");
@@ -53,7 +53,7 @@ void Generator::genStmt(NodeStmt& stmt){
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
             std::string table_name = tableNameExpr->name;
             std::cout << "CREATE TABLE " << table_name << std::endl;
-            std::ifstream db_file_in("./data/" + m_db_name + ".json");
+            std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
                 db_file_in >> db_json;
@@ -78,7 +78,7 @@ void Generator::genStmt(NodeStmt& stmt){
                 std::cout << "Table " << table_name << " already exists." << std::endl;
             }
 
-            std::ofstream db_file_out("./data/" + m_db_name + ".json");
+            std::ofstream db_file_out(m_db_name + ".json");
             db_file_out << db_json.dump(4); 
             db_file_out.close();
         }
@@ -94,7 +94,7 @@ void Generator::genStmt(NodeStmt& stmt){
             std::string table_name = tableNameExpr->name;
             std::cout << "CREATE TABLE " << table_name << std::endl;
 
-            std::ifstream db_file_in("./data/" + m_db_name + ".json");
+            std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
                 db_file_in >> db_json;
@@ -108,7 +108,7 @@ void Generator::genStmt(NodeStmt& stmt){
                 std::cout << "Table " << table_name << " not found." << std::endl;
             }
 
-            std::ofstream db_file_out("./data/" + m_db_name + ".json");
+            std::ofstream db_file_out(m_db_name + ".json");
             db_file_out << db_json.dump(4); 
             db_file_out.close();
         }
@@ -124,7 +124,7 @@ void Generator::genStmt(NodeStmt& stmt){
             std::string table_name = tableNameExpr->name;
             std::cout << "INSERT INTO TABLE " << table_name << std::endl;
 
-            std::ifstream db_file_in("./data/" + m_db_name + ".json");
+            std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
                 db_file_in >> db_json;
@@ -169,7 +169,7 @@ void Generator::genStmt(NodeStmt& stmt){
                 table_data.push_back(row);
                 db_json[table_name]["data"] = table_data;
 
-                std::ofstream db_file_out("./data/" + m_db_name + ".json");
+                std::ofstream db_file_out(m_db_name + ".json");
                 db_file_out << db_json.dump(4);
                 db_file_out.close();
 
@@ -194,15 +194,16 @@ void Generator::genStmt(NodeStmt& stmt){
         //std::cout << std::setw(20) << std::left << "List of Databases" << std::endl;
         std::cout << "-------------------------------------------" << std::endl;
 
-        const std::string dataFolderPath = "./data/";
+        const std::string currentPath = std::filesystem::current_path(); // Get the current working directory
         std::cout << std::setw(20) << std::left << "Name" << " | " << std::setw(10) << "Owner" << std::endl;    // DODATNO NAPRAVITI USER SISTEM I AUTENTIFIKACIJU KORISNIKA
         std::cout << "-------------------------------------------" << std::endl;
 
-        for (const auto& entry : std::filesystem::directory_iterator(dataFolderPath)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".json") {
-                std::cout << std::setw(20) << std::left << entry.path().stem().string() << " | " << std::setw(10) << "current" << std::endl;
-            }
+        
+    for (const auto& entry : std::filesystem::directory_iterator(currentPath)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+            std::cout << std::setw(20) << std::left << entry.path().stem().string() << " | " << std::setw(10) << "current" << std::endl;
         }
+    }
         std::cout << "-------------------------------------------" << std::endl;
     }
 
@@ -210,7 +211,7 @@ void Generator::genStmt(NodeStmt& stmt){
         std::cout << std::setw(15) << std::left << "TABLE" << " | " <<"COLUMNS" << std::endl;
         std::cout << "-------------------------------------------" << std::endl;
 
-        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
             db_file_in >> db_json;
@@ -232,7 +233,7 @@ void Generator::genStmt(NodeStmt& stmt){
             std::string table_name = tableNameExpr->name;
             std::cout << "ALTER TABLE " << table_name << std::endl;
 
-            std::ifstream db_file_in("./data/" + m_db_name + ".json");
+            std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
                 db_file_in >> db_json;
@@ -260,7 +261,7 @@ void Generator::genStmt(NodeStmt& stmt){
                 std::cout << "Table " << table_name << " not found." << std::endl;
             }
 
-            std::ofstream db_file_out("./data/" + m_db_name + ".json");
+            std::ofstream db_file_out(m_db_name + ".json");
             db_file_out << db_json.dump(4); 
             db_file_out.close();
 
@@ -274,7 +275,7 @@ void Generator::genStmt(NodeStmt& stmt){
         std::cout << "ALTER TABLE " << static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name << std::endl;
         std::string table_name = static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name;
 
-        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
             db_file_in >> db_json;
@@ -299,14 +300,14 @@ void Generator::genStmt(NodeStmt& stmt){
             std::cout << "Table " << table_name << " not found." << std::endl;
         }
 
-        std::ofstream db_file_out("./data/" + m_db_name + ".json");
+        std::ofstream db_file_out(m_db_name + ".json");
         db_file_out << db_json.dump(4); 
         db_file_out.close();
     }
     else if (NodeStmtSelect* selectStmt = dynamic_cast<NodeStmtSelect*>(&stmt)){
         std::cout << "SELECT" << std::endl;
 
-        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
             db_file_in >> db_json;
@@ -371,7 +372,7 @@ void Generator::genStmt(NodeStmt& stmt){
         
         std::cout << "SELECT WHERE" << std::endl;
 
-        std::ifstream db_file_in("./data/" + m_db_name + ".json");
+        std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
             db_file_in >> db_json;

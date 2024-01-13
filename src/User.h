@@ -14,7 +14,9 @@ public:
     static bool deleteUser(const std::string& filename, const std::string& userId);
     static std::string encrypt(const std::string& input);
     static std::string decrypt(const std::string& input);
-    static bool authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword);
+    static std::string authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword);
+    static std::vector<std::pair<std::string, User>> loadUsersFromFile(const std::string& filename);
+    static void setWorkDir(const std::string& foldername);
 
 private:
     std::string generateId(); 
@@ -23,6 +25,5 @@ private:
     std::string username;
     std::string password;
     std::string role;
-    static std::vector<User> loadUsersFromFile(const std::string& filename);
     const int shift = 1;
 };

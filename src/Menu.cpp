@@ -16,7 +16,7 @@ void Menu::showMenu() {
     std::string username;
     std::string password;
     User user = User(username, password, "user");
-
+    std::string currentId;
     switch (opt)
     {
     case 1:
@@ -26,13 +26,10 @@ void Menu::showMenu() {
         std::cout << "password: ";
         std::getline(std::cin, password);
 
-        if (User::authenticateFromFile("users.json", username, password)) {
-            authenticated = true;
-            std::cout << "Login successful!\n";
-        } else {
-            std::cout << "Wrong username or password!\n";
-            showMenu();
-        }
+        currentId = user.authenticateFromFile("users.json", username, password);
+        authenticated=true; 
+        user.setWorkDir(currentId);
+
         break;
     }
     case 2:

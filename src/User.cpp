@@ -37,7 +37,7 @@ std::string User::getRole() const {
 }
 
 std::string User::getId() const {
-    return id;
+    return this->id;
 }
 
 void User::saveToFile(const std::string& filename) const {
@@ -98,21 +98,28 @@ std::string User::decrypt(const std::string& input) {
     return result;
 }
 
-bool User::authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword) {
-    std::vector<User> users = loadUsersFromFile(filename);
-    for (const User& user : users) {
-        std::cout << user.getUsername() << " " << user.decrypt(user.getPassword()) << std::endl;
+std::string User::authenticateFromFile(const std::string& filename, const std::string& inputUsername, const std::string& inputPassword) {
+    std::vector<std::pair<std::string, User>> users = loadUsersFromFile(filename);
+
+    for (const auto& userPair : users) {
+        const std::string& userId = userPair.first;
+        const User& user = userPair.second;
+
+        //std::cout << user.getUsername() << " " << user.decrypt(user.getPassword()) << std::endl;
+
         if (user.getUsername() == inputUsername && user.decrypt(user.getPassword()) == inputPassword) {
             std::cout << "Login successful!\n";
-            return true;
+            return userId;
         }
     }
 
     std::cout << "Login failed.\n";
-    return false;
+    return "";  // Return an empty string to indicate failure
 }
 
-std::vector<User> User::loadUsersFromFile(const std::string& filename) {
+
+
+std::vector<std::pair<std::string, User>> User::loadUsersFromFile(const std::string& filename) {
     std::ifstream ifs(filename, std::ifstream::binary);
     nlohmann::json usersJson;
 
@@ -121,14 +128,24 @@ std::vector<User> User::loadUsersFromFile(const std::string& filename) {
         ifs.close();
     }
 
-    std::vector<User> users;
+    std::vector<std::pair<std::string, User>> users;
 
-    for (const auto& id : usersJson.items()) {
-        const nlohmann::json& userJson = id.value();
-        users.emplace_back(userJson["username"].get<std::string>(), 
-                           userJson["password"].get<std::string>(), 
-                           userJson["role"].get<std::string>());
+    for (const auto& entry : usersJson.items()) {
+        const std::string& userId = entry.key();
+        const nlohmann::json& userJson = entry.value();
+
+        users.emplace_back(userId,
+                           User(userJson["username"].get<std::string>(),
+                                userJson["password"].get<std::string>(),
+                                userJson["role"].get<std::string>()));
     }
 
     return users;
 }
+
+void User::setWorkDir(const std::string& foldername){
+    std::filesystem::current_path("./data/"+foldername+"/");
+    std::filesystem::path currentPath = std::filesystem::current_path();
+    std::cout<<"current path: "<<currentPath<<std::endl;
+}
+
