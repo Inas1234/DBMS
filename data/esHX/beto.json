@@ -1,15 +1,9 @@
 {
-    "nesto": {
-        "data": [],
-        "schema": {
-            "a": "int"
-        }
-    },
     "something": {
         "data": [
             {
-                "godine": 30,
-                "ime": "almir"
+                "godine": 100,
+                "ime": "neko"
             },
             {
                 "godine": 60,

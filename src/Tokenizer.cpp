@@ -14,37 +14,30 @@ std::vector<Token> Tokenizer::tokenize(){
                     buffer.push_back(consume());
                 }
                 if (buffer == "CREATE"){
-                    std::cout << "CREATE" << std::endl;
                     tokens.push_back({TokenType::CREATE});
                     buffer.clear();
                 }
                 else if (buffer == "DATABASE"){
-                    std::cout << "DATABASE" << std::endl;
                     tokens.push_back({TokenType::DATABASE});
                     buffer.clear();
                 }
                 else if (buffer == "DELETE"){
-                    std::cout << "DELETE" << std::endl;
                     tokens.push_back({TokenType::DELETE});
                     buffer.clear();
                 }
                 else if (buffer == "TABLE"){
-                    std::cout << "TABLE" << std::endl;
                     tokens.push_back({TokenType::TABLE});
                     buffer.clear();
                 }
                 else if (buffer == "USE"){
-                    std::cout << "USE" << std::endl;
                     tokens.push_back({TokenType::USE});
                     buffer.clear();
                 }
                 else if (buffer == "INSERT"){
-                    std::cout <<"INSERT" << std::endl;
                     tokens.push_back({TokenType::INSERT});
                     buffer.clear();
                 }
                 else if (buffer == "INTO"){
-                    std::cout << "INTO" << std::endl;
                     tokens.push_back({TokenType::INTO});
                     buffer.clear();
                 }
@@ -133,7 +126,6 @@ std::vector<Token> Tokenizer::tokenize(){
                     buffer.clear();
                 }
                 else{
-                    std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});
                     buffer.clear();
                 }
@@ -146,7 +138,6 @@ std::vector<Token> Tokenizer::tokenize(){
                 {
                     buffer.push_back(consume());
                 }
-                std::cout << "INTEGER: " << buffer << std::endl;
                 tokens.push_back({TokenType::INTEGER, buffer});
                 buffer.clear();
             }
@@ -168,17 +159,14 @@ std::vector<Token> Tokenizer::tokenize(){
             }
             else if (peak().value() == ','){
                 consume();
-                std::cout << "COMMA" << std::endl;
                 tokens.push_back({TokenType::COMMA});
             }
             else if (peak().value() == '{'){
                 consume();
-                std::cout << "LBRACE" << std::endl;
                 tokens.push_back({TokenType::LBRACE});
             }
             else if (peak().value() == '}'){
                 consume();
-                std::cout << "RBRACE" << std::endl;
                 tokens.push_back({TokenType::RBRACE});
             }
             else if (peak().value() == '*'){

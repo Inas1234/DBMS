@@ -5,8 +5,10 @@
 #include "Menu.h"
 std::string m_db_name;
 
-
-
+std::ostream& operator<<(std::ostream& os, NodeStmt& stmt){
+    stmt.print();
+    return os;
+}
 
 NodeExpr* Generator::genExpr(NodeExpr& expr){
     if (NodeExprIdentifier* id = dynamic_cast<NodeExprIdentifier*>(&expr)){
@@ -30,7 +32,7 @@ void Generator::genStmt(NodeStmt& stmt){
     if (NodeStmtCreateDatabase* createDbStmt = dynamic_cast<NodeStmtCreateDatabase*>(&stmt)){
         NodeExpr* expr = genExpr(*(createDbStmt->database_name));
         if (NodeExprIdentifier* dbNameExpr = dynamic_cast<NodeExprIdentifier*>(expr)) {
-            std::cout << "CREATE DATABASE " << dbNameExpr->name << std::endl;
+            std::cout << *createDbStmt << std::endl;
             std::string db_name = dbNameExpr->name;
             std::ofstream db_file(db_name + ".json");
             db_file << "{}";
@@ -53,8 +55,8 @@ void Generator::genStmt(NodeStmt& stmt){
     else if (NodeStmtCreateTable* createTableStmt = dynamic_cast<NodeStmtCreateTable*>(&stmt)) {
         NodeExpr* tableExpr = genExpr(*(createTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
+            std::cout << *createTableStmt << std::endl;
             std::string table_name = tableNameExpr->name;
-            std::cout << "CREATE TABLE " << table_name << std::endl;
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -89,12 +91,10 @@ void Generator::genStmt(NodeStmt& stmt){
         }            
         
     }
-
     else if (NodeStmtDeleteTable* deleteTableStmt = dynamic_cast<NodeStmtDeleteTable*>(&stmt)){
-        NodeExpr* tableExpr = genExpr(*(createTableStmt->table_name));
+        NodeExpr* tableExpr = genExpr(*(deleteTableStmt->table_name)); // Changed to deleteTableStmt
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
             std::string table_name = tableNameExpr->name;
-            std::cout << "CREATE TABLE " << table_name << std::endl;
 
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
@@ -117,15 +117,12 @@ void Generator::genStmt(NodeStmt& stmt){
         else {
             throw std::runtime_error("Expected NodeExprIdentifier for table name");
         }
-
-        
     }
     else if (NodeStmtInsertIntoTable* insertIntoTableStmt = dynamic_cast<NodeStmtInsertIntoTable*>(&stmt)) {
         NodeExpr* tableExpr = genExpr(*(insertIntoTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
+            std::cout << *insertIntoTableStmt << std::endl;
             std::string table_name = tableNameExpr->name;
-            std::cout << "INSERT INTO TABLE " << table_name << std::endl;
-
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -186,14 +183,12 @@ void Generator::genStmt(NodeStmt& stmt){
         NodeExpr* expr = genExpr(*(useDbStmt->database_name));
         if (NodeExprIdentifier* dbNameExpr = dynamic_cast<NodeExprIdentifier*>(expr)) {
             m_db_name = dbNameExpr->name;
-            std::cout << "USE DATABASE " << m_db_name << std::endl;
         }
         else {
             throw std::runtime_error("Expected NodeExprIdentifier for database name");
         }
     }
     else if(NodeStmtShowDatabases* showDbStmt = dynamic_cast<NodeStmtShowDatabases*>(&stmt)){
-        //std::cout << std::setw(20) << std::left << "List of Databases" << std::endl;
             std::cout << "-------------------------------------------" << std::endl;
 
             const std::string currentPath = std::filesystem::current_path().string(); // Get the current working directory as a string
@@ -232,8 +227,8 @@ void Generator::genStmt(NodeStmt& stmt){
     else if (NodeStmtAlterTable* alterTableStmt = dynamic_cast<NodeStmtAlterTable*>(&stmt)){
         NodeExpr* tableExpr = genExpr(*(alterTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
+            std::cout << *alterTableStmt << std::endl;
             std::string table_name = tableNameExpr->name;
-            std::cout << "ALTER TABLE " << table_name << std::endl;
 
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
@@ -274,7 +269,6 @@ void Generator::genStmt(NodeStmt& stmt){
 
     }
     else if (NodeStmtAlterDropColumn* alterDropColumnStmt = dynamic_cast<NodeStmtAlterDropColumn*>(&stmt)){
-        std::cout << "ALTER TABLE " << static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name << std::endl;
         std::string table_name = static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name;
 
         std::ifstream db_file_in(m_db_name + ".json");
@@ -307,8 +301,7 @@ void Generator::genStmt(NodeStmt& stmt){
         db_file_out.close();
     }
     else if (NodeStmtSelect* selectStmt = dynamic_cast<NodeStmtSelect*>(&stmt)){
-        std::cout << "SELECT" << std::endl;
-
+        std::cout << *selectStmt << std::endl;
         std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -371,9 +364,7 @@ void Generator::genStmt(NodeStmt& stmt){
         }
     }
     else if (NodeStmtSelectWhere * selectWhereStmt = dynamic_cast<NodeStmtSelectWhere*>(&stmt)){
-        
-        std::cout << "SELECT WHERE" << std::endl;
-
+        //std::cout << *selectWhereStmt << std::endl;
         std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -386,9 +377,6 @@ void Generator::genStmt(NodeStmt& stmt){
             nlohmann::json table_schema = db_json[table_name]["schema"];
             nlohmann::json table_data = db_json[table_name]["data"];
 
-            // ... [Rest of the code in this block remains unchanged] ...
-
-            // Get column names
             std::vector<std::string> col_names;
             for (auto& colName : table_schema.items()) {
                 col_names.push_back(colName.key());
@@ -396,7 +384,6 @@ void Generator::genStmt(NodeStmt& stmt){
 
 
 
-            // Evaluate WHERE condition
             std::string where_col_name = static_cast<NodeExprIdentifier*>(selectWhereStmt->where_column.get())->name;
             NodeExpr* where_value_expr = genExpr(*selectWhereStmt->where_value);
             std::string where_value = where_value_expr->toString(); // Assuming you have a toString method
@@ -406,7 +393,6 @@ void Generator::genStmt(NodeStmt& stmt){
             std::vector<nlohmann::json> filtered_rows;
             for (auto& row : table_data) {
                 std::string row_col_value = row[where_col_name].dump();
-                // check if row[where_col_name] has quatation marks
                 if (row_col_value[0] == '"') {
                     row_col_value = row[where_col_name].dump().substr(1, row[where_col_name].dump().size() - 2);
                 }
@@ -425,7 +411,6 @@ void Generator::genStmt(NodeStmt& stmt){
                 }
             }
 
-            // Print results
             std::vector<std::string> select_col_names;
 
             if (selectWhereStmt->columns.size() == 1 && dynamic_cast<NodeExprIdentifier*>(selectWhereStmt->columns.front().get())->name == "*") {
@@ -448,7 +433,6 @@ void Generator::genStmt(NodeStmt& stmt){
                 }
             }
 
-            // Make sure you use the filtered rows here
             const int col_width = 20;
             std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
             std::cout << std::setw(col_width) << std::left << "TABLE" << " | ";
@@ -468,7 +452,6 @@ void Generator::genStmt(NodeStmt& stmt){
             std::cout << std::string(col_width * (select_col_names.size() + 1) + select_col_names.size() * 3, '-') << std::endl;
 
         
-            // ... [Rest of the code in this block remains unchanged] ...
         } else {
             std::cout << "Table " << table_name << " not found." << std::endl;
         }
@@ -489,7 +472,6 @@ void Generator::genStmt(NodeStmt& stmt){
         
     }
     else if (NodeStmtLogout *stmtLogout = dynamic_cast<NodeStmtLogout*>(&stmt)){
-        std::cout << "LOGOUT" << std::endl;
         std::filesystem::current_path("../../");
         m_db_name = "";
         m_loggedOut = true;
@@ -498,7 +480,6 @@ void Generator::genStmt(NodeStmt& stmt){
     else if (NodeStmtDeleteUser *stmtDeleteUser = dynamic_cast<NodeStmtDeleteUser*>(&stmt)){
         if (User::checkIfCurrentUserAdmin()){
             std::string username = static_cast<NodeExprIdentifier*>(stmtDeleteUser->username.get())->name;
-            std::cout << "DELETE USER " << username << std::endl;
             User::deleteUser("../../users.json", username);
         }
         else{
@@ -506,7 +487,7 @@ void Generator::genStmt(NodeStmt& stmt){
         }
     }
     else if (NodeStmtUpdate *stmtUpdate = dynamic_cast<NodeStmtUpdate*>(&stmt)){
-        std::cout << "UPDATE" << std::endl;
+        std::cout << *stmtUpdate << std::endl;
         std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -546,18 +527,15 @@ void Generator::genStmt(NodeStmt& stmt){
                 }
             }
 
-            // Evaluate WHERE condition
             std::string where_col_name = static_cast<NodeExprIdentifier*>(stmtUpdate->where_column.get())->name;
             NodeExpr* where_value_expr = genExpr(*stmtUpdate->where_value);
             std::string where_value = where_value_expr->toString(); // Assuming you have a toString method
             TokenType where_op = stmtUpdate->where_op.type;
-            std::cout << "WHERE " << where_col_name << " " << where_value << std::endl;
 
             std::vector<nlohmann::json> filtered_rows;
             for (auto& row : table_data) {
                 std::string row_col_value = row[where_col_name].dump();
 
-                // Check if row[where_col_name] has quotation marks and remove them
                 if (row_col_value[0] == '"') {
                     row_col_value = row_col_value.substr(1, row_col_value.size() - 2);
                 }
@@ -569,7 +547,6 @@ void Generator::genStmt(NodeStmt& stmt){
                     shouldUpdate = true;
                 }
 
-                // Update the row if it matches the WHERE condition
                 if (shouldUpdate) {
                     for (size_t i = 0; i < select_col_names.size(); ++i) {
                         if (i < stmtUpdate->values.size()) {

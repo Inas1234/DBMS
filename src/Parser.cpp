@@ -120,7 +120,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
                 return stmt;
             }
             else{
-                throw std::runtime_error("Expected DATABASE or TABLE"); //treba malo popravit
+                throw std::runtime_error("Expected DATABASE or TABLE"); 
             }
             break;
 
@@ -241,7 +241,7 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             }
         case TokenType::SELECT:
         {
-            consume(); // Consume SELECT token
+            consume();
             std::unique_ptr<NodeStmtSelect> stmt = std::make_unique<NodeStmtSelect>();
             std::unique_ptr<NodeStmtSelectWhere> stmt2 = std::make_unique<NodeStmtSelectWhere>();
 
@@ -255,28 +255,27 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             if (!peak().has_value()) {
                 throw std::runtime_error("Unexpected end of input: Expected FROM");
             }
-            consume(); // Consume FROM token
+            consume(); 
             stmt->table_name = parseExpression();
             stmt2->table_name = stmt->table_name->clone();
 
             if (peak().has_value() && peak()->type == TokenType::WHERE){
-                consume(); // Consume WHERE token
+                consume(); 
 
                 stmt2->where_column = parseExpression();
 
                 if (peak().has_value() && (peak()->type == TokenType::EQUALS || peak()->type == TokenType::NOT_EQUAL)){
                     stmt2->where_op = peak().value();
-                    consume(); // Consume the operator token
-
+                    consume(); 
                     stmt2->where_value = parseExpression();
-                    return stmt2; // Return SELECT WHERE statement
+                    return stmt2; 
                 }
                 else{
                     throw std::runtime_error("Expected EQUALS or NOT_EQUAL after WHERE column");
                 }
             }
             else {
-                return stmt; // Return regular SELECT statement
+                return stmt; 
             }
         }
         case TokenType::LOGOUT:{

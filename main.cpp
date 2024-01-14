@@ -13,7 +13,7 @@ int main() {
     Menu menu;
     menu.showMenu();
 
-    while (menu.authenticated) {  //dodati logout funkciju, nakon koje se ovo mijenja
+    while (menu.authenticated) {  
         std::cout << "mlinql > ";
         if (!std::getline(std::cin, input)) {
             break;
