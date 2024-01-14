@@ -188,6 +188,23 @@ class NodeStmtLogout : public NodeStmt {
 public:
 };
 
+class NodeStmtUpdate : public NodeStmt {
+public:
+    std::unique_ptr<NodeExpr> table_name;
+    std::vector<std::unique_ptr<NodeExpr>> columns;
+    std::vector<std::unique_ptr<NodeExpr>> values;
+    std::unique_ptr<NodeExpr> where_column;
+    std::unique_ptr<NodeExpr> where_value;
+    Token where_op;
+
+
+    void print() override{
+        std::cout << "NodeStmtUpdate" << std::endl;
+        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
+        std::cout << "Where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
+        std::cout << "Where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
+    }
+};
 
 struct NodeProgram {
     std::vector<std::unique_ptr<NodeStmt>> statements;

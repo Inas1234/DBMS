@@ -285,7 +285,42 @@ std::unique_ptr<NodeStmt> Parser::parseStmt(){
             return stmt;
             break;
         }
-        
+        case TokenType::UPDATE:{
+            consume();
+            std::unique_ptr<NodeStmtUpdate> stmt = std::make_unique<NodeStmtUpdate>();
+            stmt->table_name = parseExpression();
+            if (peak().value().type == TokenType::SET){
+                consume();
+                while (peak().value().type != TokenType::WHERE){
+                    stmt->columns.push_back(parseExpression());
+                    if (peak().value().type == TokenType::EQUALS){
+                        consume();
+                        stmt->values.push_back(parseExpression());
+                    }
+                    else{
+                        throw std::runtime_error("Expected EQUALS");
+                    }
+                    if (peak().value().type == TokenType::COMMA){
+                        consume();
+                    }
+                }
+                consume();
+                stmt->where_column = parseExpression();
+                if (peak().value().type == TokenType::EQUALS || peak().value().type == TokenType::NOT_EQUAL){
+                    stmt->where_op = peak().value();
+                    consume();
+                    stmt->where_value = parseExpression();
+                    return stmt;
+                }
+                else{
+                    throw std::runtime_error("Expected EQUALS or NOT_EQUAL");
+                }
+            }
+            else{
+                throw std::runtime_error("Expected SET");
+            }
+            break;
+        }
         default:
             throw std::runtime_error("Invalid token in parseStmt");
     }

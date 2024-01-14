@@ -124,6 +124,14 @@ std::vector<Token> Tokenizer::tokenize(){
                     tokens.push_back({TokenType::LOGOUT});
                     buffer.clear();
                 }
+                else if (buffer == "UPDATE"){
+                    tokens.push_back({TokenType::UPDATE});
+                    buffer.clear();
+                }
+                else if (buffer == "SET"){
+                    tokens.push_back({TokenType::SET});
+                    buffer.clear();
+                }
                 else{
                     std::cout << "IDENTIFIER: " << buffer << std::endl;
                     tokens.push_back({TokenType::IDENTIFIER, buffer});

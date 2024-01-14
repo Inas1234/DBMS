@@ -93,6 +93,7 @@
     "codecvt": "cpp",
     "forward_list": "cpp",
     "filesystem": "cpp",
-    "shared_mutex": "cpp"
+    "shared_mutex": "cpp",
+    "*.ipp": "cpp"
   }
 }

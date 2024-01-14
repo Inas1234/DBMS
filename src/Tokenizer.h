@@ -39,7 +39,9 @@ enum class TokenType{
     IDENTIFIED,
     BY,
     ROLE,
-    LOGOUT
+    LOGOUT,
+    UPDATE,
+    SET,
 };
 
 struct Token {

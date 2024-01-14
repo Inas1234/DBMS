@@ -505,6 +505,99 @@ void Generator::genStmt(NodeStmt& stmt){
             std::cout << "Only admin can delete users" << std::endl;
         }
     }
+    else if (NodeStmtUpdate *stmtUpdate = dynamic_cast<NodeStmtUpdate*>(&stmt)){
+        std::cout << "UPDATE" << std::endl;
+        std::ifstream db_file_in(m_db_name + ".json");
+        nlohmann::json db_json;
+        if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
+            db_file_in >> db_json;
+        }
+        db_file_in.close();
+
+        std::string table_name = static_cast<NodeExprIdentifier*>(stmtUpdate->table_name.get())->name;
+        if (db_json.find(table_name) != db_json.end()) {
+            nlohmann::json table_schema = db_json[table_name]["schema"];
+            nlohmann::json table_data = db_json[table_name]["data"];
+
+            std::vector<std::string> col_names;
+            for (auto& colName : table_schema.items()) {
+                col_names.push_back(colName.key());
+            }
+
+            std::vector<std::string> select_col_names;
+
+            if (stmtUpdate->columns.size() == 1 && dynamic_cast<NodeExprIdentifier*>(stmtUpdate->columns.front().get())->name == "*") {
+                select_col_names = col_names;
+            } else {
+                for (auto& colExpr : stmtUpdate->columns) {
+                    NodeExpr* colExprPtr = genExpr(*colExpr);
+                    if (NodeExprIdentifier* colNameExpr = dynamic_cast<NodeExprIdentifier*>(colExprPtr)) {
+                        std::string col_name = colNameExpr->name;
+                        if (std::find(col_names.begin(), col_names.end(), col_name) != col_names.end()) {
+                            select_col_names.push_back(col_name);
+                        } else {
+                            std::cout << "Column " << col_name << " not found in schema." << std::endl;
+                            return;
+                        }
+                    } else {
+                        std::cout << "Invalid type for column identifier" << std::endl;
+                        return;
+                    }
+                }
+            }
+
+            // Evaluate WHERE condition
+            std::string where_col_name = static_cast<NodeExprIdentifier*>(stmtUpdate->where_column.get())->name;
+            NodeExpr* where_value_expr = genExpr(*stmtUpdate->where_value);
+            std::string where_value = where_value_expr->toString(); // Assuming you have a toString method
+            TokenType where_op = stmtUpdate->where_op.type;
+            std::cout << "WHERE " << where_col_name << " " << where_value << std::endl;
+
+            std::vector<nlohmann::json> filtered_rows;
+            for (auto& row : table_data) {
+                std::string row_col_value = row[where_col_name].dump();
+
+                // Check if row[where_col_name] has quotation marks and remove them
+                if (row_col_value[0] == '"') {
+                    row_col_value = row_col_value.substr(1, row_col_value.size() - 2);
+                }
+
+                bool shouldUpdate = false;
+                if (where_op == TokenType::EQUALS && row_col_value == where_value) {
+                    shouldUpdate = true;
+                } else if (where_op == TokenType::NOT_EQUAL && row_col_value != where_value) {
+                    shouldUpdate = true;
+                }
+
+                // Update the row if it matches the WHERE condition
+                if (shouldUpdate) {
+                    for (size_t i = 0; i < select_col_names.size(); ++i) {
+                        if (i < stmtUpdate->values.size()) {
+                            NodeExpr* valueExpr = genExpr(*(stmtUpdate->values[i]));
+                            std::string col_name = select_col_names[i];
+
+                            if (NodeExprString* valueStringExpr = dynamic_cast<NodeExprString*>(valueExpr)) {
+                                row[col_name] = valueStringExpr->value;
+                            } else if (NodeExprInteger* valueIntExpr = dynamic_cast<NodeExprInteger*>(valueExpr)) {
+                                row[col_name] = valueIntExpr->value;
+                            }
+                        }
+                    }
+                }
+            }
+
+            db_json[table_name]["data"] = table_data;
+
+            std::ofstream db_file_out(m_db_name + ".json");
+            db_file_out << db_json.dump(4);
+            db_file_out.close();
+
+
+        }
+        else {
+            std::cout << "Table " << table_name << " not found." << std::endl;
+        }
+    }
     else{
         throw std::runtime_error("Invalid statement");
     }
