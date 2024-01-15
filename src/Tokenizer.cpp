@@ -153,7 +153,6 @@ std::vector<Token> Tokenizer::tokenize(){
                 else{
                     throw std::runtime_error("Expected '");
                 }
-                std::cout << "STRING: " << buffer << std::endl;
                 tokens.push_back({TokenType::STRING, buffer});
                 buffer.clear();
             }

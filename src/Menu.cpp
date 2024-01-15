@@ -4,10 +4,14 @@
 #include <memory>
 
 void Menu::showMenu() {
-    system("clear");
+    std::cout << "\n\n\n\n";
+    std::cout << "Welcome to mlinql!\n";
+    std::cout << "------------------\n";
+    std::cout << "MAIN MENU:\n";
     std::cout << "1. Login\n";
     std::cout << "2. Help [COMMANDS]\n";
     std::cout << "3. Exit\n";
+    std::cout << "------------------\n";
     std::cout << "Enter your option: ";
 
     int opt;
@@ -31,6 +35,7 @@ void Menu::showMenu() {
         if(!currentId.empty()){
             authenticated=true; 
             user.setWorkDir(currentId);
+            system("clear");
         } else{
             authenticated=false;
             system("clear");
@@ -56,9 +61,9 @@ void Menu::showHelp() {
     system("clear");
     std::cout << "Available commands:\n";
 
-    std::cout << "* CREATE DATABASE [database_name]\n";
-    std::cout << "* CREATE TABLE [table_name] {\n";
-    std::cout << "    [column_name],[column_name],\n";
+    std::cout << "~ CREATE DATABASE [database_name]\n";
+    std::cout << "~ CREATE TABLE [table_name] {\n";
+    std::cout << "    [column_name column_type],[column_name column_type],\n";
     std::cout << "    ...\n";
     std::cout << "    }\n\n";
 
@@ -74,8 +79,8 @@ void Menu::showHelp() {
     std::cout << "~ SELECT [* or column_name(s)] FROM [table_name]\n";
     std::cout << "~ SELECT * FROM [table_name] WHERE [column_name] = [value]\n\n"; //provjerit
 
-    std::cout << "~ ALTER TABLE [table_name] ADD [column_name]\n";
-    std::cout << "~ ALTER TABLE [table_name] DROP [column_name]\n\n";
+    std::cout << "~ ALTER TABLE [table_name] ADD [column_name column_type]\n";
+    std::cout << "~ ALTER TABLE [table_name] DROP COLUMN [column_name]\n\n";
 
     std::cout << "~ UPDATE [table_name] SET [column_name] = [value] WHERE [column_name] = [value]\n\n";
 
@@ -84,9 +89,9 @@ void Menu::showHelp() {
    
     std::cout << "~ LOGOUT\n";
    
-    std::cout << "~ admin commands:\n";
+    std::cout << "  admin commands:\n";
     std::cout << "~ CREATE USER [username] IDENTIFIED BY [password] ROLE [role]\n";
-    std::cout << "~ DELETE USER [username]";
+    std::cout << "~ DELETE USER [username]\n\n";
     
     std::cout << "press any key to close Help\n";
     std::cin.ignore();
