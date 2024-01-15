@@ -1,0 +1,14 @@
+{
+  "nesto": {
+    "data": [
+      {
+        "godine": 100,
+        "ime": "neko"
+      }
+    ],
+    "schema": {
+      "godine": "int",
+      "ime": "string"
+    }
+  }
+}
