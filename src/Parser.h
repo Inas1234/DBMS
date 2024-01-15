@@ -120,16 +120,12 @@ public:
     std::vector<std::unique_ptr<NodeExpr>> values;
     std::vector<std::unique_ptr<NodeExpr>> columns;
     void print() override{
-        std::cout << "INSERT INTO TABLE" << std::endl;
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
-        std::cout << "Columns: " << std::endl;
+        std::cout << "inserted into " << static_cast<NodeExprIdentifier*>(table_name.get())->name<<std::endl;
+        std::cout << "columns: " << std::endl;
         for (auto& col : columns){
-            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name << std::endl;
+            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name<<" ";
         }
-        std::cout << "Values: " << std::endl;
-        for (auto& val : values){
-            std::cout << static_cast<NodeExprString*>(val.get())->value << std::endl;
-        }
+        std::cout << std::endl;
     }
 };
 
@@ -140,9 +136,8 @@ public:
     std::unique_ptr<NodeExpr> new_column_name;
     Token data_type;
     void print() override{
-        std::cout << "ALTER TABLE" << std::endl;
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
-        std::cout << "New column name: " << static_cast<NodeExprIdentifier*>(new_column_name.get())->name << std::endl;
+        std::cout << "altered " << static_cast<NodeExprIdentifier*>(table_name.get())->name <<std::endl;
+        std::cout << "new column name: " << static_cast<NodeExprIdentifier*>(new_column_name.get())->name << std::endl;
     }
 };
 
@@ -152,9 +147,8 @@ public:
     std::unique_ptr<NodeExpr> column_name;
 
     void print() override{
-        std::cout << "ALTER DROP COLUMN" << std::endl;
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
-        std::cout << "Column name: " << static_cast<NodeExprIdentifier*>(column_name.get())->name << std::endl;
+        std::cout << "dropped column " << static_cast<NodeExprIdentifier*>(column_name.get())->name << " from " <<
+        static_cast<NodeExprIdentifier*>(table_name.get())->name  <<std::endl;
     }
 };
 
@@ -174,12 +168,12 @@ public:
     std::unique_ptr<NodeExpr> table_name;
 
     void print() override{
-        std::cout << "SELECT" << std::endl;
-        std::cout << "Columns: " << std::endl;
+        std::cout << "selected ";
+        std::cout << "columns: "<<std::endl;
         for (auto& col : columns){
-            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name << std::endl;
+            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name<<" ";
         }
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
+        std::cout << "from table: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
     }
 };
 
@@ -192,14 +186,13 @@ public:
     Token where_op;
 
     void print() override{
-        std::cout << "SELECT WHERE" << std::endl;
-        std::cout << "Columns: " << std::endl;
+        std::cout << "selected columns: " << std::endl;
         for (auto& col : columns){
-            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name << std::endl;
+            std::cout << static_cast<NodeExprIdentifier*>(col.get())->name<<" ";
         }
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
-        std::cout << "Where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
-        std::cout << "Where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
+        std::cout << "\nfrom table: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
+        std::cout << "where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
+        std::cout << "where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
     }
 
 };
@@ -231,10 +224,9 @@ public:
 
 
     void print() override{
-        std::cout << "UPDATE" << std::endl;
-        std::cout << "Table name: " << static_cast<NodeExprIdentifier*>(table_name.get())->name << std::endl;
-        std::cout << "Where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
-        std::cout << "Where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
+        std::cout << "updated table " << static_cast<NodeExprIdentifier*>(table_name.get())->name <<std::endl;
+        std::cout << "where column: " << static_cast<NodeExprIdentifier*>(where_column.get())->name << std::endl;
+        std::cout << "where value: " << static_cast<NodeExprString*>(where_value.get())->value << std::endl;
     }
     std::ostream& operator<<(std::ostream& os) {
         print();

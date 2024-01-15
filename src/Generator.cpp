@@ -32,7 +32,7 @@ void Generator::genStmt(NodeStmt& stmt){
     if (NodeStmtCreateDatabase* createDbStmt = dynamic_cast<NodeStmtCreateDatabase*>(&stmt)){
         NodeExpr* expr = genExpr(*(createDbStmt->database_name));
         if (NodeExprIdentifier* dbNameExpr = dynamic_cast<NodeExprIdentifier*>(expr)) {
-           // std::cout << *createDbStmt << std::endl;
+            std::cout << *createDbStmt << std::endl;
             std::string db_name = dbNameExpr->name;
             std::ofstream db_file(db_name + ".json");
             db_file << "{}";
@@ -55,6 +55,7 @@ void Generator::genStmt(NodeStmt& stmt){
     else if (NodeStmtCreateTable* createTableStmt = dynamic_cast<NodeStmtCreateTable*>(&stmt)) {
         NodeExpr* tableExpr = genExpr(*(createTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
+            std::cout<<*createTableStmt<<std::endl;
             std::string table_name = tableNameExpr->name;
             std::ifstream db_file_in(m_db_name + ".json");
             // check if db exists
@@ -100,7 +101,7 @@ void Generator::genStmt(NodeStmt& stmt){
         NodeExpr* tableExpr = genExpr(*(deleteTableStmt->table_name)); // Changed to deleteTableStmt
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
             std::string table_name = tableNameExpr->name;
-
+            std::cout<<*deleteTableStmt<<std::endl;
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -126,7 +127,7 @@ void Generator::genStmt(NodeStmt& stmt){
     else if (NodeStmtInsertIntoTable* insertIntoTableStmt = dynamic_cast<NodeStmtInsertIntoTable*>(&stmt)) {
         NodeExpr* tableExpr = genExpr(*(insertIntoTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
-           // std::cout << *insertIntoTableStmt << std::endl;
+            std::cout << *insertIntoTableStmt << std::endl;
             std::string table_name = tableNameExpr->name;
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
@@ -240,7 +241,7 @@ void Generator::genStmt(NodeStmt& stmt){
         NodeExpr* tableExpr = genExpr(*(alterTableStmt->table_name));
         if (NodeExprIdentifier* tableNameExpr = dynamic_cast<NodeExprIdentifier*>(tableExpr)) {
             std::string table_name = tableNameExpr->name;
-
+            std::cout<<*alterTableStmt<<std::endl;
             std::ifstream db_file_in(m_db_name + ".json");
             nlohmann::json db_json;
             if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -281,7 +282,7 @@ void Generator::genStmt(NodeStmt& stmt){
     }
     else if (NodeStmtAlterDropColumn* alterDropColumnStmt = dynamic_cast<NodeStmtAlterDropColumn*>(&stmt)){
         std::string table_name = static_cast<NodeExprIdentifier*>(alterDropColumnStmt->table_name.get())->name;
-
+        std::cout<<*alterDropColumnStmt<<std::endl;
         std::ifstream db_file_in(m_db_name + ".json");
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
@@ -376,6 +377,7 @@ void Generator::genStmt(NodeStmt& stmt){
     }
     else if (NodeStmtSelectWhere * selectWhereStmt = dynamic_cast<NodeStmtSelectWhere*>(&stmt)){
         std::ifstream db_file_in(m_db_name + ".json");
+        std::cout << *selectWhereStmt << std::endl;
         nlohmann::json db_json;
         if (db_file_in.peek() != std::ifstream::traits_type::eof()) {
             db_file_in >> db_json;
