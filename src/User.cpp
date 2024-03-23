@@ -176,7 +176,7 @@ bool User::checkIfCurrentUserAdmin(){
 
 bool User::deleteUser(const std::string& filename, const std::string& userId){
     bool check;
-    if(checkIfCurrentUserAdmin){
+    if(checkIfCurrentUserAdmin()){
         std::cout<<"Are you sure you want to delete this user? (y/n)"<<std::endl;
         std::string answer;
         std::cin>>answer;

@@ -1,7 +1,7 @@
 {
   "files.associations": {
-    "*.ejs": "html",
     "*.embeddedhtml": "html",
+    "*.ejs": "html",
     "cctype": "cpp",
     "clocale": "cpp",
     "cmath": "cpp",
@@ -94,6 +94,15 @@
     "forward_list": "cpp",
     "filesystem": "cpp",
     "shared_mutex": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "__tree": "cpp",
+    "__verbose_abort": "cpp",
+    "charconv": "cpp",
+    "execution": "cpp",
+    "future": "cpp",
+    "queue": "cpp",
+    "regex": "cpp",
+    "span": "cpp",
+    "unordered_set": "cpp"
   }
 }
